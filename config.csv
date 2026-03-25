@@ -1,0 +1,7 @@
+shift_id,label,h1_spots,h2_spots,wc_spots
+tue_dinner,Tuesday 4:25,2,2,0
+tue_late,Tuesday Late,1,1,0
+wed_dinner,Wednesday 4:25,2,2,0
+wed_late,Wednesday Late,2,2,2
+thu_dinner,Thursday 4:25,2,2,0
+thu_late,Thursday Late,2,2,0

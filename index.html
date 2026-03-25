@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Mansfield League — 2025–26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="club-name">MADISON CURLING CLUB</div>
+      <div class="league-name">Mansfield League <span class="season">2025–26</span></div>
+    </div>
+    <nav class="tabs">
+      <button type="button" class="tab active" data-tab="standings" onclick="showTab('standings')">Standings</button>
+      <button type="button" class="tab" data-tab="bracket" onclick="showTab('bracket')">Playoffs</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div id="tab-standings" class="tab-panel active">
+    <div id="standings-root">
+      <div class="loading">Loading standings…</div>
+    </div>
+  </div>
+  <div id="tab-bracket" class="tab-panel">
+    <div id="bracket-root">
+      <div class="loading">Loading bracket…</div>
+    </div>
+  </div>
+</main>
+
+<script src="bracket.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

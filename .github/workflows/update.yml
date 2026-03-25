@@ -1,0 +1,32 @@
+name: Update standings
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - results.xlsx
+      - config.csv
+      - engine.py
+      - export.py
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install openpyxl
+
+      - run: python export.py
+
+      - name: Commit updated data.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-update data.json"
+          file_pattern: data.json
