@@ -257,8 +257,8 @@ main {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
-  background: var(--accent);
-  color: var(--header-fg);
+  background: var(--green);
+  color: #fff;
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -267,48 +267,110 @@ main {
   justify-content: center;
   flex-shrink: 0;
 }
-.bye-name { font-weight: 600; font-size: 15px; }
-.bye-meta { font-family: var(--font-mono); font-size: 11px; color: var(--header-muted); }
+.bye-name { font-weight: 600; font-size: 16px; }
+.bye-meta { font-family: var(--font-mono); font-size: 12px; color: var(--header-muted); }
 
-/* ── Shift Block ─────────────────────────────────── */
-.shift-block {
-  margin-bottom: 40px;
+/* ── Shift Card ──────────────────────────────────── */
+.shift-card {
+  margin-bottom: 12px;
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--bg-elevated);
 }
-.shift-header {
+
+.shift-summary {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 16px 20px;
   background: var(--bg2);
-  border-bottom: 2px solid var(--rule);
-  padding: 14px 20px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+  min-height: 64px;
+}
+.shift-summary:hover  { background: var(--surface-hover); }
+.shift-summary.is-open { border-bottom: 2px solid var(--rule); }
+
+.shift-summary-left {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
 .shift-title {
   font-family: var(--font-display);
-  font-size: 24px;
-  letter-spacing: .06em;
+  font-size: 22px;
+  letter-spacing: .05em;
   color: var(--ink);
+  line-height: 1.1;
+  white-space: nowrap;
 }
-.shift-desc {
+.shift-spot-count {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink3);
   letter-spacing: .06em;
 }
 
-.shift-legend {
-  margin: 0;
-  padding: 10px 18px 12px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--ink2);
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--rule);
+/* Topline chips */
+.shift-topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
 }
-.shift-legend strong { color: var(--ink); font-weight: 600; }
+.topline-chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.topline-chip .chip-spot { font-size: 10px; font-weight: 400; opacity: .8; }
+.topline-chip .chip-rec  { font-size: 10px; font-weight: 400; opacity: .75; }
+.chip-h1      { background: var(--row-qual-bg);  color: var(--green); border: 1px solid rgba(46,204,113,.35); }
+.chip-h2      { background: var(--row-h2-badge); color: var(--blue);  border: 1px solid rgba(93,173,226,.35); }
+.chip-wc      { background: var(--row-wc-bg);    color: var(--gold);  border: 1px solid rgba(240,192,64,.35); }
+.chip-lead    { color: var(--amber); border: 1px solid rgba(240,192,64,.5); }
+.chip-neutral { color: var(--ink2); border: 1px solid var(--rule); }
+.topline-empty { font-family: var(--font-mono); font-size: 12px; color: var(--ink3); font-style: italic; }
+
+/* Chevron */
+.shift-chevron {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink3);
+  transition: transform .2s ease;
+}
+.shift-chevron::after { content: '▾'; font-size: 20px; line-height: 1; }
+.shift-summary.is-open .shift-chevron { transform: rotate(180deg); }
+
+/* EWC card accent */
+.ewc-card { border-color: var(--ewc-border); }
+.ewc-card .shift-summary { border-left: 3px solid var(--gold); }
+.ewc-card .shift-title { color: var(--ewc-title); }
+
+/* legacy alias */
+.shift-desc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink3);
+  letter-spacing: .06em;
+}
 
 /* ── Half Panels ─────────────────────────────────── */
 .halves { display: flex; }
@@ -361,9 +423,9 @@ main {
 }
 .h1-section-sub {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 1.35;
+  line-height: 1.4;
   color: var(--ink3);
   text-transform: none;
   letter-spacing: 0;
@@ -461,7 +523,7 @@ main {
   color: var(--amber);
   border: 1px solid var(--amber);
 }
-.h1-name { font-weight: 600; font-size: 15px; flex: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.h1-name { font-weight: 600; font-size: 16px; flex: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .h1-clinch-how {
   font-family: var(--font-mono);
   font-size: 8px;
@@ -569,7 +631,7 @@ main {
   color: var(--amber);
   border: 1px solid var(--amber);
 }
-.h2-name { font-size: 14px; font-weight: 500; flex: 1; }
+.h2-name { font-size: 15px; font-weight: 500; flex: 1; }
 .h2-rec {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -604,7 +666,7 @@ main {
 .full-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
 }
 .full-table th {
   font-family: var(--font-mono);
@@ -883,6 +945,17 @@ main {
     border-top: 3px solid var(--h2-accent);
   }
 
+  /* Card summary stacks: left col full width, chips below */
+  .shift-summary {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    padding: 14px 16px;
+    min-height: 56px;
+  }
+  .shift-summary-left { grid-column: 1; grid-row: 1; }
+  .shift-chevron      { grid-column: 2; grid-row: 1; align-self: start; }
+  .shift-topline      { grid-column: 1 / -1; grid-row: 2; margin-top: 8px; }
+
   .header-inner {
     flex-direction: column;
     align-items: stretch;
@@ -890,39 +963,20 @@ main {
     padding-left: max(12px, env(safe-area-inset-left, 0px));
     padding-right: max(12px, env(safe-area-inset-right, 0px));
   }
-  .header-right {
-    width: 100%;
-    justify-content: space-between;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .tabs {
-    flex: 1;
-    border-top: none;
-    justify-content: stretch;
-  }
+  .tabs { flex: 1; justify-content: stretch; }
   .tab {
     flex: 1;
     padding: 14px 12px;
-    font-size: 10px;
+    font-size: 12px;
     min-height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .theme-switch {
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 4px 8px 4px 10px;
-    flex-shrink: 0;
-  }
-  .theme-btn {
-    min-width: 44px;
-    padding: 0 8px;
-    font-size: 9px;
-  }
 
   .league-name { font-size: 22px; }
   main {
-    padding-top: 20px;
+    padding-top: 16px;
     padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
   }
 
@@ -935,21 +989,18 @@ main {
   .expand-btn {
     min-height: 48px;
     padding: 14px 16px;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .h2-cols { flex-direction: column; }
   .h2-col { border-right: none; border-bottom: 1px solid var(--rule); }
   .h2-col:last-child { border-bottom: none; }
 
-  .bracket-note {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .reset-btn {
-    min-height: 44px;
-    padding: 10px 16px;
-  }
+  .bracket-note { flex-direction: column; align-items: flex-start; }
+  .reset-btn { min-height: 44px; padding: 10px 16px; }
+
+  .full-table td { padding: 8px 10px; font-size: 13px; }
+  .full-table td:first-child { font-size: 14px; }
 }
 
 @media (max-width: 400px) {

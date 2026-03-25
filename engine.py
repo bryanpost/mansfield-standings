@@ -496,18 +496,29 @@ def determine_spots(pool, spots, rec_fn, rem_fn, half_done):
 
         else:
             # Worst case for winner vs best case for first_out
-            wr   = rec_fn(winner)
-            fo   = rec_fn(first_out)
+            wr    = rec_fn(winner)
+            fo    = rec_fn(first_out)
             w_rem = rem_fn(winner)
             o_rem = rem_fn(first_out)
 
-            worst_winner = {"w": wr["w"],        "l": wr["l"] + w_rem}
-            best_out     = {"w": fo["w"] + o_rem, "l": fo["l"]}
+            worst_winner_half = {"w": wr["w"],        "l": wr["l"] + w_rem}
+            best_out_half     = {"w": fo["w"] + o_rem, "l": fo["l"]}
 
-            if ahead(worst_winner, best_out):
+            if ahead(worst_winner_half, best_out_half):
+                # Clinched on half record alone
                 clinched.add(winner["name"])
             else:
-                leading.add(winner["name"])
+                # Not ahead on half in worst case — check TB1 (overall season record).
+                # If winner's worst-case overall is ≥1 full game ahead of first_out's
+                # best-case overall, winner wins the tiebreak regardless of half result.
+                w_ov = orec(winner)
+                f_ov = orec(first_out)
+                worst_winner_ov = {"w": w_ov["w"], "l": w_ov["l"] + w_rem}
+                best_out_ov     = {"w": f_ov["w"] + o_rem, "l": f_ov["l"]}
+                if ahead(worst_winner_ov, best_out_ov):
+                    clinched.add(winner["name"])
+                else:
+                    leading.add(winner["name"])
 
     return {"clinched": clinched, "leading": leading, "clinch_how": clinch_how}
 

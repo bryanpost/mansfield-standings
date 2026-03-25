@@ -11,7 +11,7 @@ async function loadData() {
   return resp.json();
 }
 
-// ── Render helpers ────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────
 function shiftAbbr(id) {
   return id.replace('tue_dinner','Tue 4:25').replace('tue_late','Tue Late')
            .replace('wed_dinner','Wed 4:25').replace('wed_late','Wed Late')
@@ -52,46 +52,63 @@ function rowCls(t) {
   return '';
 }
 
-// ── Shift rendering ───────────────────────────────────────────────
-function renderShift(shift) {
-  const teams = shift.teams;
+// ── Topline chip row (always-visible shift summary) ───────────────
+function renderTopline(teams) {
+  const spotTeams = teams
+    .filter(t => t.spot_label)
+    .sort((a, b) => {
+      const order = s => s.startsWith('H1') ? 0 : s.startsWith('H2') ? 1 : 2;
+      return order(a.spot_label) - order(b.spot_label)
+          || a.spot_label.localeCompare(b.spot_label);
+    });
 
+  if (!spotTeams.length) {
+    // Fall back to showing the current H1 leaders (top 2 by H1 record)
+    const h1Leaders = [...teams]
+      .sort((a, b) => b.h1.pct - a.h1.pct || a.draw_rank - b.draw_rank)
+      .slice(0, 2);
+    if (!h1Leaders.length) return `<span class="topline-empty">No results yet</span>`;
+    return h1Leaders.map(t =>
+      `<span class="topline-chip chip-neutral">${t.name} <span class="chip-rec">${t.h1.w}–${t.h1.l} H1</span></span>`
+    ).join('');
+  }
+
+  return spotTeams.map(t => {
+    const clinched = t.status === 'clinched';
+    const cls = clinched
+      ? (t.spot_label.startsWith('H1') ? 'chip-h1' : t.spot_label.startsWith('H2') ? 'chip-h2' : 'chip-wc')
+      : 'chip-lead';
+    const icon = clinched ? '✓' : '▲';
+    return `<span class="topline-chip ${cls}">${icon} ${t.name} <span class="chip-spot">${t.spot_label}</span></span>`;
+  }).join('');
+}
+
+// ── Shift card ────────────────────────────────────────────────────
+function renderShift(shift) {
+  const teams      = shift.teams;
+  const totalSpots = shift.h1_spots + shift.h2_spots + shift.wc_spots;
+  const sid        = shift.shift_id;
+
+  // ── H1 panel ────────────────────────────────────────────────
   const h1Qual = teams.filter(t => t.status === 'clinched' && t.spot_label?.startsWith('H1'))
                       .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
   const h1Lead = teams.filter(t => t.status === 'leadH1')
                       .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
-  const h2Qual = teams.filter(t => t.status === 'clinched' && t.spot_label?.startsWith('H2'))
-                      .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
-  const h2Lead = teams.filter(t => t.status === 'leadH2'  && t.spot_label?.startsWith('H2'))
-                      .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
-  const wcQual = teams.filter(t => t.status === 'clinched' && t.spot_label?.startsWith('SWC'))
-                      .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
-  const wcLead = teams.filter(t => t.status === 'leadH2'  && t.spot_label?.startsWith('SWC'))
-                      .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
-
-  const contention = teams.filter(t => t.status === 'contention')
-                          .sort((a, b) => b.h2.pct - a.h2.pct);
-  const elim       = teams.filter(t => t.status === 'elim')
-                          .sort((a, b) => b.h2.pct - a.h2.pct);
-
   const inH1Spot = t => t.spot_label?.startsWith('H1');
   const h1Other  = teams.filter(t => !inH1Spot(t))
                         .sort((a, b) => b.h1.pct - a.h1.pct || a.draw_rank - b.draw_rank);
 
-  // ── H1 row renderers ─────────────────────────────────────────
   function h1RowClinchLead(t) {
-    const isLead   = t.status === 'leadH1';
-    const recMain  = isLead ? `${t.overall.w}–${t.overall.l}` : `${t.h1.w}–${t.h1.l}`;
-    const recHtml  = isLead
+    const isLead  = t.status === 'leadH1';
+    const recMain = isLead ? `${t.overall.w}–${t.overall.l}` : `${t.h1.w}–${t.h1.l}`;
+    const recHtml = isLead
       ? `<span class="h1-rec"><span class="h1-rec-num">${recMain}</span><span class="h1-rec-context">overall</span></span>`
       : `<span class="h1-rec">${recMain}</span>`;
-
     const how      = t.status === 'clinched' && t.spot_label?.startsWith('H1') && t.h1_clinch_how;
     const howShort = { solo: 'Outright', half: 'Half +1', overall: 'Overall' };
     const howHtml  = how
       ? `<span class="h1-clinch-how kind-${t.h1_clinch_how}" title="${h1ClinchCaption(t.h1_clinch_how).replace(/"/g,'&quot;')}">${howShort[t.h1_clinch_how]}</span>`
       : '';
-
     return `<div class="h1-row">
       ${spotEl(t.spot_label, t.status === 'clinched')}
       <span class="h1-name">${t.name}${howHtml}</span>
@@ -101,11 +118,10 @@ function renderShift(shift) {
 
   function h1RowOther(t) {
     let tag = '';
-    if (t.status === 'clinched' && t.spot_label && !t.spot_label.startsWith('H1')) {
-      tag = `<span class="h1-inline-tag clinch" title="Earned via 2nd half or shift WC">✓ ${t.spot_label}</span>`;
-    } else if (t.status === 'leadH2') {
-      tag = `<span class="h1-inline-tag lead" title="Leading for this spot (not clinched)">▲ ${t.spot_label}</span>`;
-    }
+    if (t.status === 'clinched' && t.spot_label && !t.spot_label.startsWith('H1'))
+      tag = `<span class="h1-inline-tag clinch">✓ ${t.spot_label}</span>`;
+    else if (t.status === 'leadH2')
+      tag = `<span class="h1-inline-tag lead">▲ ${t.spot_label}</span>`;
     return `<div class="h1-row h1-row-other">
       <span class="h1-name">${t.name}${tag}</span>
       <span class="h1-rec">
@@ -115,10 +131,9 @@ function renderShift(shift) {
     </div>`;
   }
 
-  // ── H1 panel sections ────────────────────────────────────────
   const h1SecClinched = h1Qual.length
     ? `<div class="h1-section">
-        <div class="h1-section-head"><strong>✓ Clinched</strong><span class="h1-section-sub">${shift.h1_spots} spot${shift.h1_spots > 1 ? 's' : ''}. <strong>Outright</strong> = no one within one game of this half record. <strong>Half +1</strong> = ≥1 full game ahead on H1 vs next team out. <strong>Overall</strong> = tied on H1 but ≥1 game ahead overall. Hover for details.</span></div>
+        <div class="h1-section-head"><strong>✓ Clinched</strong><span class="h1-section-sub">${shift.h1_spots} spot${shift.h1_spots > 1 ? 's' : ''}. <strong>Outright</strong> = no one within one game. <strong>Half +1</strong> = ≥1 full game ahead on H1. <strong>Overall</strong> = tied on H1 but ≥1 game ahead overall.</span></div>
         ${h1Qual.map(h1RowClinchLead).join('')}
       </div>`
     : `<div class="h1-section"><div class="h1-section-head"><strong>✓ Clinched</strong></div>
@@ -126,58 +141,59 @@ function renderShift(shift) {
 
   const h1SecLeading = h1Lead.length
     ? `<div class="h1-section">
-        <div class="h1-section-head"><strong>▲ Leading</strong><span class="h1-section-sub">Ahead for a spot but not clinched — overall record shown (used as tiebreaker when within one game on H1)</span></div>
+        <div class="h1-section-head"><strong>▲ Leading</strong><span class="h1-section-sub">Ahead but not clinched — overall record shown (tiebreaker when within one game on H1)</span></div>
         ${h1Lead.map(h1RowClinchLead).join('')}
       </div>`
     : '';
 
-  const h1OtherTitle  = shift.h1_done ? 'Out of H1 spots' : 'Not in a top H1 spot yet';
-  const hasOtherBadge = h1Other.some(t =>
-    (t.status === 'clinched' && t.spot_label && !t.spot_label.startsWith('H1')) ||
-    t.status === 'leadH2');
-  const h1OtherSub = hasOtherBadge
-    ? `<span class="h1-section-sub">Badges show teams leading or clinched for 2nd half / shift WC.</span>`
-    : shift.h1_done ? '' : `<span class="h1-section-sub">Sorted by 1st-half record.</span>`;
-
-  const nOther    = h1Other.length;
-  const otherId   = `h1-other-${shift.shift_id}`;
+  const nOther  = h1Other.length;
+  const otherId = `h1-other-${sid}`;
   const collapseO = nOther > 3;
+  const h1OtherTitle = shift.h1_done ? 'Out of H1 spots' : 'Not in a top H1 spot yet';
   const h1SecOther = nOther === 0 ? '' : `<div class="h1-section h1-section-other">
-    <div class="h1-section-head"><strong>${h1OtherTitle}</strong>${h1OtherSub}</div>
+    <div class="h1-section-head"><strong>${h1OtherTitle}</strong></div>
     ${collapseO
       ? `<button type="button" class="h1-other-toggle" data-count="${nOther}" onclick="toggleEl('${otherId}')">▼ ${nOther} teams — show list</button>
          <div id="${otherId}" class="h1-other-body" style="display:none">${h1Other.map(h1RowOther).join('')}</div>`
       : h1Other.map(h1RowOther).join('')}
   </div>`;
 
-  const h1Body = h1SecClinched + h1SecLeading + h1SecOther;
+  const h1Panel = `<div class="h1-panel">
+    <div class="h1-header">1st Half — ${shift.h1_spots} spot${shift.h1_spots > 1 ? 's' : ''}</div>
+    <div class="h1-sections">${h1SecClinched}${h1SecLeading}${h1SecOther}</div>
+  </div>`;
 
-  // ── Shift WC panel (wed_late only) ───────────────────────────
+  // ── Shift WC panel (wed_late only) ──────────────────────────
   let wcPanel = '';
   if (shift.wc_spots > 0) {
+    const wcQual = teams.filter(t => t.status === 'clinched' && t.spot_label?.startsWith('SWC'));
+    const wcLead = teams.filter(t => t.status === 'leadH2'   && t.spot_label?.startsWith('SWC'));
     const wcRows = [...wcQual, ...wcLead].map(t =>
-      `<div class="h1-row">
-        ${spotEl(t.spot_label, t.status === 'clinched')}
-        <span class="h1-name">${t.name}</span>
-        <span class="h1-rec">${t.overall.w}–${t.overall.l}</span>
-      </div>`
+      `<div class="h1-row">${spotEl(t.spot_label, t.status === 'clinched')}
+       <span class="h1-name">${t.name}</span>
+       <span class="h1-rec">${t.overall.w}–${t.overall.l}</span></div>`
     ).join('') || `<div class="h1-row"><span class="h1-name placeholder-empty">None yet</span></div>`;
-
     wcPanel = `<div class="wc-panel">
       <div class="wc-header">Shift Wild Card${shift.wc_spots > 1 ? 's' : ''} — ${shift.wc_spots} spot${shift.wc_spots > 1 ? 's' : ''}</div>
       ${wcRows}
     </div>`;
   }
 
-  // ── H2 panel ─────────────────────────────────────────────────
+  // ── H2 panel ────────────────────────────────────────────────
+  const h2Qual     = teams.filter(t => t.status === 'clinched' && t.spot_label?.startsWith('H2'))
+                          .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
+  const h2Lead     = teams.filter(t => t.status === 'leadH2'   && t.spot_label?.startsWith('H2'))
+                          .sort((a, b) => a.spot_label.localeCompare(b.spot_label));
+  const contention = teams.filter(t => t.status === 'contention').sort((a,b) => b.h2.pct - a.h2.pct);
+  const elim       = teams.filter(t => t.status === 'elim').sort((a,b) => b.h2.pct - a.h2.pct);
+
   function h2Row(t, showSpot) {
-    const spotHtml = showSpot ? `${spotEl(t.spot_label, t.status === 'clinched')} ` : '';
+    const sp = showSpot ? `${spotEl(t.spot_label, t.status === 'clinched')} ` : '';
     return `<div class="h2-row">
-      ${spotHtml}<span class="h2-name${t.status === 'elim' ? ' elim' : ''}">${t.name}</span>
+      ${sp}<span class="h2-name${t.status === 'elim' ? ' elim' : ''}">${t.name}</span>
       <span class="h2-rec${t.status === 'elim' ? ' elim' : ''}">${t.h2.w}–${t.h2.l}</span>
     </div>`;
   }
-
   function h2Col(items, header, showSpot = false) {
     if (!items.length) return '';
     return `<div class="h2-col">
@@ -192,56 +208,63 @@ function renderShift(shift) {
     h2Col(elim, 'Out (H2 path)', false),
   ].filter(Boolean).join('');
 
-  // ── Full standings table (collapsible) ───────────────────────
-  const allSorted = [...teams].sort(
-    (a, b) => b.overall.pct - a.overall.pct || a.draw_rank - b.draw_rank
-  );
+  const h2Panel = `<div class="h2-panel">
+    <div class="h2-header">2nd Half — ${shift.h2_spots} spot${shift.h2_spots > 1 ? 's' : ''} <span class="h2-header-hint">(teams without an H1 spot)</span></div>
+    <div class="h2-cols">${h2ColsHtml || '<div class="h2-empty">No results yet</div>'}</div>
+  </div>`;
 
-  const tblRows = allSorted.map(t =>
-    `<tr class="${rowCls(t)}">
-      <td>${t.name}</td>
-      <td>${t.h1.w}–${t.h1.l}</td>
-      <td>${t.h2.w}–${t.h2.l}</td>
-      <td><strong>${t.overall.w}–${t.overall.l}</strong></td>
-      <td>${t.draw_display}</td>
-      <td>${statusBadge(t)}</td>
-    </tr>`
-  ).join('');
+  // ── Full standings table (2nd expand) ────────────────────────
+  const allSorted = [...teams].sort((a, b) => b.overall.pct - a.overall.pct || a.draw_rank - b.draw_rank);
+  const tblRows = allSorted.map(t => `<tr class="${rowCls(t)}">
+    <td>${t.name}</td>
+    <td>${t.h1.w}–${t.h1.l}</td>
+    <td>${t.h2.w}–${t.h2.l}</td>
+    <td><strong>${t.overall.w}–${t.overall.l}</strong></td>
+    <td>${t.draw_display}</td>
+    <td>${statusBadge(t)}</td>
+  </tr>`).join('');
 
-  const bid = `tbl-${shift.shift_id}`;
-  return `<div class="shift-block">
-    <div class="shift-header">
-      <span class="shift-title">${shift.label}</span>
-      <span class="shift-desc">${shift.h1_spots + shift.h2_spots + shift.wc_spots} playoff spots from this shift</span>
-    </div>
-    <div class="halves">
-      <div class="h1-panel">
-        <div class="h1-header">1st Half — ${shift.h1_spots} spot${shift.h1_spots > 1 ? 's' : ''}</div>
-        <div class="h1-sections">${h1Body}</div>
+  const tableId = `tbl-${sid}`;
+
+  return `<div class="shift-card">
+    <button class="shift-summary" onclick="toggleShift('${sid}')"
+            id="shift-btn-${sid}" aria-expanded="false" aria-controls="shift-details-${sid}">
+      <div class="shift-summary-left">
+        <span class="shift-title">${shift.label}</span>
+        <span class="shift-spot-count">${totalSpots} playoff spots</span>
       </div>
-      ${wcPanel}
-      <div class="h2-panel">
-        <div class="h2-header">2nd Half — ${shift.h2_spots} spot${shift.h2_spots > 1 ? 's' : ''} <span class="h2-header-hint">(teams without an H1 spot)</span></div>
-        <div class="h2-cols">${h2ColsHtml || '<div class="h2-empty">No results yet</div>'}</div>
+      <div class="shift-topline">${renderTopline(teams)}</div>
+      <span class="shift-chevron" aria-hidden="true"></span>
+    </button>
+
+    <div class="shift-details" id="shift-details-${sid}" hidden>
+      <div class="halves">
+        ${h1Panel}
+        ${wcPanel}
+        ${h2Panel}
       </div>
-    </div>
-    <button class="expand-btn" onclick="toggleEl('${bid}')">▼ Full standings — all records &amp; draw shot</button>
-    <div id="${bid}" style="display:none" class="full-table">
-      <table>
-        <thead><tr>
-          <th>Skip</th><th>H1</th><th>H2</th><th>Overall</th><th>Draw</th><th>Status</th>
-        </tr></thead>
-        <tbody>${tblRows}</tbody>
-      </table>
+      <button class="expand-btn" onclick="toggleEl('${tableId}')">▼ Full standings — all records &amp; draw shot</button>
+      <div id="${tableId}" style="display:none" class="full-table">
+        <table>
+          <thead><tr><th>Skip</th><th>H1</th><th>H2</th><th>Overall</th><th>Draw</th><th>Status</th></tr></thead>
+          <tbody>${tblRows}</tbody>
+        </table>
+      </div>
     </div>
   </div>`;
 }
 
-// ── EWC section ───────────────────────────────────────────────────
+// ── EWC card ──────────────────────────────────────────────────────
 function renderEWC(ewc) {
   const pool   = ewc.pool;
   const inPlay = pool.filter(t => t.ewc_status !== 'elim');
   const elim   = pool.filter(t => t.ewc_status === 'elim');
+
+  // Topline: current EWC holders (or top 4 if none)
+  const wcTeams = pool.filter(t => t.ewc_status === 'wc');
+  const topline = wcTeams.length
+    ? wcTeams.map(t => `<span class="topline-chip chip-lead">▲ ${t.name} <span class="chip-spot">${t.shift_label.replace('Tuesday','Tue').replace('Wednesday','Wed').replace('Thursday','Thu')}</span></span>`).join('')
+    : pool.slice(0, 4).map(t => `<span class="topline-chip chip-neutral">${t.name} <span class="chip-rec">${t.overall.w}–${t.overall.l}</span></span>`).join('');
 
   function ewcRow(t, i) {
     const chip = t.ewc_status === 'wc'
@@ -251,8 +274,7 @@ function renderEWC(ewc) {
       : `<span class="status-badge badge-elim">Eliminated</span>`;
     const rc = t.ewc_status === 'wc' ? 'row-wc' : t.ewc_status === 'elim' ? 'row-elim' : '';
     return `<tr class="${rc}">
-      <td>${i + 1}</td>
-      <td>${t.name}</td>
+      <td>${i + 1}</td><td>${t.name}</td>
       <td>${t.shift_label}</td>
       <td><strong>${t.overall.w}–${t.overall.l}</strong></td>
       <td>${t.draw_display}</td>
@@ -263,30 +285,37 @@ function renderEWC(ewc) {
   const inPlayRows = inPlay.map((t, i) => ewcRow(t, i)).join('');
   const elimRows   = elim.map((t, i)  => ewcRow(t, inPlay.length + i)).join('');
 
-  return `<div class="ewc-block">
-    <div class="ewc-block-header">
-      <span class="ewc-title">⭐ Event Wild Cards — 4 Spots</span>
-      <span class="ewc-desc">Best overall record among teams not qualified via their shift · ${ewc.winners_count} awarded · ${ewc.contention_count} in contention</span>
-    </div>
-    <div class="ewc-table">
-      <table>
-        <thead><tr><th>#</th><th>Skip</th><th>Shift</th><th>Overall</th><th>Draw</th><th>Status</th></tr></thead>
-        <tbody>${inPlayRows}</tbody>
-      </table>
-      ${elimRows ? `
-        <button class="expand-btn" onclick="toggleEl('ewc-elim')">▼ Show ${elim.length} eliminated</button>
-        <div id="ewc-elim" style="display:none">
-          <table><thead><tr><th>#</th><th>Skip</th><th>Shift</th><th>Overall</th><th>Draw</th><th>Status</th></tr></thead>
-            <tbody>${elimRows}</tbody>
-          </table>
-        </div>` : ''}
+  return `<div class="shift-card ewc-card">
+    <button class="shift-summary" onclick="toggleShift('ewc')"
+            id="shift-btn-ewc" aria-expanded="false" aria-controls="shift-details-ewc">
+      <div class="shift-summary-left">
+        <span class="shift-title">Event Wild Cards</span>
+        <span class="shift-spot-count">4 spots · best overall across all shifts</span>
+      </div>
+      <div class="shift-topline">${topline}</div>
+      <span class="shift-chevron" aria-hidden="true"></span>
+    </button>
+
+    <div class="shift-details" id="shift-details-ewc" hidden>
+      <div class="ewc-table">
+        <table>
+          <thead><tr><th>#</th><th>Skip</th><th>Shift</th><th>Overall</th><th>Draw</th><th>Status</th></tr></thead>
+          <tbody>${inPlayRows}</tbody>
+        </table>
+        ${elimRows ? `
+          <button class="expand-btn" onclick="toggleEl('ewc-elim')">▼ Show ${elim.length} eliminated</button>
+          <div id="ewc-elim" style="display:none">
+            <table><thead><tr><th>#</th><th>Skip</th><th>Shift</th><th>Overall</th><th>Draw</th><th>Status</th></tr></thead>
+              <tbody>${elimRows}</tbody></table>
+          </div>` : ''}
+      </div>
     </div>
   </div>`;
 }
 
 // ── Byes banner ───────────────────────────────────────────────────
 function renderByesBanner(qualified) {
-  const byes = qualified.slice(0, 4);
+  const byes    = qualified.slice(0, 4);
   const entries = byes.map((t, i) =>
     `<div class="bye-entry">
       <span class="bye-seed">${i + 1}</span>
@@ -315,7 +344,7 @@ async function init() {
 
   } catch (e) {
     document.getElementById('standings-root').innerHTML =
-      `<div class="loading" style="color:#e74c3c">Error: ${e.message}<br>
+      `<div class="loading error">Error: ${e.message}<br>
        <small>Local: make sure <code>python server.py</code> is running.</small></div>`;
     console.error(e);
   }
@@ -329,15 +358,24 @@ function showTab(name) {
   if (panel) panel.classList.add('active');
 }
 
+function toggleShift(sid) {
+  const details = document.getElementById(`shift-details-${sid}`);
+  const btn     = document.getElementById(`shift-btn-${sid}`);
+  if (!details || !btn) return;
+  const opening = details.hidden;
+  details.hidden = !opening;
+  btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+  btn.classList.toggle('is-open', opening);
+}
+
 function toggleEl(id) {
   const el = document.getElementById(id);
   if (!el) return;
   const btn    = el.previousElementSibling;
   const hidden = el.style.display === 'none';
   el.style.display = hidden ? 'block' : 'none';
-  if (btn?.classList.contains('expand-btn')) {
+  if (btn?.classList.contains('expand-btn'))
     btn.textContent = btn.textContent.replace(hidden ? '▼' : '▲', hidden ? '▲' : '▼');
-  }
   if (btn?.classList.contains('h1-other-toggle')) {
     const n = btn.dataset.count || '0';
     btn.textContent = hidden ? '▲ Hide list' : `▼ ${n} teams — show list`;
