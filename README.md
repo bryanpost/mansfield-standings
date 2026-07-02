@@ -1,9 +1,11 @@
 # Mansfield Curling — Standings site
 
+**Live:** https://bryanpost.github.io/mansfield-standings/
+**Repo:** https://github.com/bryanpost/mansfield-standings
+
 Live, auto-computed league standings + open game/draw entry.
 Static site (no server): the pages load React from a CDN and read/write the
-Supabase database directly over its REST API. Any free static host works;
-these instructions use **GitHub Pages**.
+Supabase database directly over its REST API. Hosted on **GitHub Pages**.
 
 ## Pages
 | URL | File | Purpose | Who uses it |
@@ -13,37 +15,41 @@ these instructions use **GitHub Pages**.
 | `/enter/draws/` | `enter/draws/index.html` | Draw-shot entry (once per team) | Admins |
 
 `support.js` (runtime) and `mansfield-data.js` (Supabase data layer) live at the
-site root. `index.html` imports them as `./…`; the nested entry pages import them
-as `../../…`. Keep that structure intact.
+site root. Path rules that MUST hold for the nested entry pages to work:
+- The `<script src="…support.js">` tag resolves relative to the **HTML page**, so
+  `index.html` uses `./support.js` and the nested entry pages use `../../support.js`.
+- The dynamic `import('./mansfield-data.js')` inside the app resolves relative to
+  **support.js** (always the site root), NOT the page — so it is `./mansfield-data.js`
+  on *every* page regardless of nesting. Do not "correct" it to `../../`; that
+  overshoots the GitHub Pages project prefix and breaks the entry pages.
 
 ---
 
-## Deploy to GitHub Pages (one time, ~10 min)
+## How changes get deployed (current workflow)
 
-1. **Create a repo** on github.com — e.g. `mansfield-curling`. Public is fine
-   (the data is already public; the publishable key is safe to ship).
-2. **Add these files to the repo root.** Everything in this `deploy/` folder —
-   the five site files **and** the `.github/` folder — becomes the repository
-   root. Either:
-   - drag-and-drop the files into the repo's web uploader, **or**
-   - `git init` in this folder, then
-     ```
-     git add .
-     git commit -m "Mansfield standings site"
-     git remote add origin https://github.com/<you>/mansfield-curling.git
-     git push -u origin main
-     ```
-3. **Turn on Pages:** repo → **Settings → Pages** → *Source* = **Deploy from a
-   branch** → Branch = **main**, folder = **/ (root)** → **Save**.
-4. Wait ~1 minute. Your site is at:
-   ```
-   https://<you>.github.io/mansfield-curling/
-   ```
+The site source lives in a separate design project (Design Components +
+`deploy/` staging folder). Changes flow to this repo like so:
+
+1. **Author in the design project.** Edits are made to the source there and
+   staged into its `deploy/` folder.
+2. **Hand off to Claude Code.** Open Claude Code, run `/design-login` so it can
+   see the design project's files, then paste the commit instructions produced
+   in the design chat — what changed, the commit message, and "push to main."
+3. **Claude Code commits + pushes to `main`** directly. No manual file copying,
+   downloading, or drag-and-drop.
+4. **GitHub Pages redeploys automatically** (~1 min) from `main` / root.
+
+> The design chat can *read* this repo (to verify a push landed) but cannot push
+> itself — that's why the commit step runs through Claude Code.
+
+### GitHub Pages settings (already configured, for reference)
+**Settings → Pages** → Source = **Deploy from a branch** → Branch = **main**,
+folder = **/ (root)**.
 
 ### The three URLs to share
-- Standings (link this from the club site): `https://<you>.github.io/mansfield-standings/`
-- Results entry (give to captains): `.../enter/results/`
-- Draw entry (admins): `.../enter/draws/`
+- Standings (link this from the club site): https://bryanpost.github.io/mansfield-standings/
+- Results entry (give to captains): https://bryanpost.github.io/mansfield-standings/enter/results/
+- Draw entry (admins): https://bryanpost.github.io/mansfield-standings/enter/draws/
 
 The entry pages are deliberately **not** linked from the public standings — with
 the open-write model, a visible button would invite anyone to change scores.
