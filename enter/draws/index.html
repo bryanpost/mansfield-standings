@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
+<script src="../../support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -60,7 +60,7 @@
       <div style="font-size:12.5px;color:oklch(50% 0.03 250)"><strong style="color:oklch(30% 0.03 250);font-weight:700">{{ enteredCount }}</strong> of {{ teamCount }} recorded</div>
     </div>
 
-    <div style="font-size:12px;line-height:1.5;color:oklch(52% 0.03 250);margin-bottom:14px">Measurement in inches from the button — <strong style="color:oklch(38% 0.03 250)">0.0 to 72.0, to the nearest ½″</strong>. Lower is better. Tap <strong style="color:oklch(38% 0.03 250)">X</strong> if a team didn’t complete their draw (ranks last). Leave blank if not thrown yet.</div>
+    <div style="font-size:12px;line-height:1.5;color:oklch(52% 0.03 250);margin-bottom:14px">Measurement in inches from the button — <strong style="color:oklch(38% 0.03 250)">0.0 to 72.0, to the nearest ½″</strong>. Lower is better. Tap <strong style="color:oklch(38% 0.03 250)">X</strong> if a team didn't complete their draw (ranks last). Leave blank if not thrown yet.</div>
 
     <!-- team rows -->
     <div style="display:flex;flex-direction:column;gap:9px">
@@ -101,7 +101,7 @@ class Component extends DCLogic {
   state = { shift:0, draft:{}, ready:false, error:null, flash:false, saving:false };
 
   componentDidMount(){
-    import('./mansfield-data.js')
+    import('../../mansfield-data.js')
       .then(m => { this.dataLib = m; return m.loadSeason(m.DEFAULT_SEASON); })
       .then(data=>{ this.build(data); this.setState({ ready:true, draft:this.draftFor(this.shifts[0]) }); })
       .catch(e=>this.setState({ error:String(e) }));

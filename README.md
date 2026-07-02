@@ -6,14 +6,15 @@ Supabase database directly over its REST API. Any free static host works;
 these instructions use **GitHub Pages**.
 
 ## Pages
-| File | Purpose | Who uses it |
-|---|---|---|
-| `index.html` | Public standings (tiebreaker engine + playoff berths) | Everyone / club site link |
-| `enter-results.html` | Tap-the-winner result entry | Shift captains |
-| `enter-draws.html` | Draw-shot entry (once per team) | Admins |
+| URL | File | Purpose | Who uses it |
+|---|---|---|---|
+| `/` | `index.html` | Public standings (tiebreaker engine + playoff berths) | Everyone / club site link |
+| `/enter/results/` | `enter/results/index.html` | Tap-the-winner result entry | Shift captains |
+| `/enter/draws/` | `enter/draws/index.html` | Draw-shot entry (once per team) | Admins |
 
-`support.js` (runtime) and `mansfield-data.js` (Supabase data layer) must stay
-next to the HTML files — the pages import them by relative path.
+`support.js` (runtime) and `mansfield-data.js` (Supabase data layer) live at the
+site root. `index.html` imports them as `./…`; the nested entry pages import them
+as `../../…`. Keep that structure intact.
 
 ---
 
@@ -40,9 +41,13 @@ next to the HTML files — the pages import them by relative path.
    ```
 
 ### The three URLs to share
-- Standings (link this from the club site): `https://<you>.github.io/mansfield-curling/`
-- Results entry (give to captains): `.../enter-results.html`
-- Draw entry (admins): `.../enter-draws.html`
+- Standings (link this from the club site): `https://<you>.github.io/mansfield-standings/`
+- Results entry (give to captains): `.../enter/results/`
+- Draw entry (admins): `.../enter/draws/`
+
+The entry pages are deliberately **not** linked from the public standings — with
+the open-write model, a visible button would invite anyone to change scores.
+Captains bookmark the direct URLs above.
 
 ---
 
