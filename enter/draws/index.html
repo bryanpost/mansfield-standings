@@ -227,7 +227,7 @@ class Component extends DCLogic {
       statusText, statusColor:sc, statusBg:sbg, statusBorder:sbd,
       dirty, flash:this.state.flash,
       submit:()=>this.submit(), revert:()=>this.revert(),
-      submitLabel: this.state.saving?'Saving…':'Save draws',
+      submitLabel: this.state.saving?'Saving…':'Save',
       submitDisabled: canSubmit ? '' : 'true',
       submitBg: canSubmit?ACC:'oklch(80% 0.02 250)', submitCursor:canSubmit?'pointer':'default', submitOpacity:canSubmit?'1':'.7',
     };
