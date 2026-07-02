@@ -11,8 +11,10 @@ Supabase database directly over its REST API. Hosted on **GitHub Pages**.
 | URL | File | Purpose | Who uses it |
 |---|---|---|---|
 | `/` | `index.html` | Public standings (tiebreaker engine + playoff berths) | Everyone / club site link |
-| `/enter/results/` | `enter/results/index.html` | Tap-the-winner result entry | Shift captains |
+| `/enter/games/` | `enter/games/index.html` | Tap-the-winner result entry | Shift captains |
 | `/enter/draws/` | `enter/draws/index.html` | Draw-shot entry (once per team) | Admins |
+
+`/enter/` (no sub-path) redirects to `/enter/games/`.
 
 `support.js` (runtime) and `mansfield-data.js` (Supabase data layer) live at the
 site root. Path rules that MUST hold for the nested entry pages to work:
@@ -48,7 +50,7 @@ folder = **/ (root)**.
 
 ### The three URLs to share
 - Standings (link this from the club site): https://bryanpost.github.io/mansfield-standings/
-- Results entry (give to captains): https://bryanpost.github.io/mansfield-standings/enter/results/
+- Results entry (give to captains): https://bryanpost.github.io/mansfield-standings/enter/games/
 - Draw entry (admins): https://bryanpost.github.io/mansfield-standings/enter/draws/
 
 The entry pages are deliberately **not** linked from the public standings — with
