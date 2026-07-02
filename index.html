@@ -64,7 +64,7 @@
       <div style="display:flex;gap:22px;flex-wrap:wrap">
         <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(52% 0.13 152)"></span><div><div style="font-weight:600;font-size:14px">1st Half · 1H</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Top finisher(s) of the first half.</div></div></div>
         <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(53% 0.13 248)"></span><div><div style="font-weight:600;font-size:14px">2nd Half · 2H</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Top finisher(s) of the second half.</div></div></div>
-        <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(60% 0.13 66)"></span><div><div style="font-weight:600;font-size:14px">Wild Card · WC</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Best remaining on shift (Wed Late only).</div></div></div>
+        <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(60% 0.13 66)"></span><div><div style="font-weight:600;font-size:14px">Shift Wild Card · SWC</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Best remaining on shift (Wed Late only).</div></div></div>
         <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(55% 0.13 300)"></span><div><div style="font-weight:600;font-size:14px">Event WC · EWC</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Best remaining records league-wide.</div></div></div>
       </div>
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid oklch(91% 0.016 232);font-size:12.5px;line-height:1.5;color:oklch(53% 0.03 250)"><strong style="color:oklch(29% 0.03 250);font-weight:600">Tiebreakers:</strong> overall record, then head-to-head, then draw shot, then coin flip. <strong style="color:oklch(29% 0.03 250);font-weight:600">Draw</strong> = draw-shot measurement (inches from the button, lower is better); <span style="color:oklch(58% 0.16 27);font-weight:600">X</span> or – means not yet recorded and ranks last.</div>
@@ -128,7 +128,7 @@
         <span style="width:34px;text-align:right;font-weight:700;font-size:14px;color:{{ t.streakColor }}">{{ t.streakText }}</span>
       </div></sc-for>
     </div>
-    <div style="padding:11px 22px;border-top:1px solid #1b212c;font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.1em;display:flex;gap:14px;flex-wrap:wrap;position:relative;z-index:4"><span style="color:oklch(82% 0.18 150)">■ 1H</span><span style="color:oklch(80% 0.13 210)">■ 2H</span><span style="color:oklch(84% 0.16 88)">■ WC</span><span style="color:oklch(72% 0.16 310)">■ EWC</span><span style="color:#5b6675;margin-left:auto">DRAW = TIEBREAK (IN) · LOW BEST</span></div>
+    <div style="padding:11px 22px;border-top:1px solid #1b212c;font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.1em;display:flex;gap:14px;flex-wrap:wrap;position:relative;z-index:4"><span style="color:oklch(82% 0.18 150)">■ 1H</span><span style="color:oklch(80% 0.13 210)">■ 2H</span><span style="color:oklch(84% 0.16 88)">■ SWC</span><span style="color:oklch(72% 0.16 310)">■ EWC</span><span style="color:#5b6675;margin-left:auto">DRAW = TIEBREAK (IN) · LOW BEST</span></div>
   </div>
 </div>
 </sc-if>
@@ -152,7 +152,7 @@
       <span style="width:44px;text-align:right;font:700 13px 'Space Mono',monospace;color:{{ t.drawColor }}">{{ t.drawText }}</span>
       <sc-if value="{{ t.hasBerth }}" hint-placeholder-val="{{ true }}"><span style="font:700 11px 'Space Mono',monospace;background:{{ t.berthSoft }};color:#0c0c0a;padding:2px 7px">{{ t.berthShort }}</span></sc-if>
     </div></sc-for>
-    <div style="border-top:2px solid #0c0c0a;padding:12px 22px;font:700 11px 'Space Mono',monospace;letter-spacing:.04em;display:flex;gap:16px;flex-wrap:wrap"><span>■ 1H</span><span>■ 2H</span><span>■ WC</span><span>■ EWC</span><span style="color:oklch(64% 0.21 28)">▌ PLAYOFF FIELD</span><span style="margin-left:auto">DRAW = TIEBREAK (IN)</span></div>
+    <div style="border-top:2px solid #0c0c0a;padding:12px 22px;font:700 11px 'Space Mono',monospace;letter-spacing:.04em;display:flex;gap:16px;flex-wrap:wrap"><span>■ 1H</span><span>■ 2H</span><span>■ SWC</span><span>■ EWC</span><span style="color:oklch(64% 0.21 28)">▌ PLAYOFF FIELD</span><span style="margin-left:auto">DRAW = TIEBREAK (IN)</span></div>
   </div>
 </div>
 </sc-if>
@@ -161,7 +161,7 @@
 class Component extends DCLogic {
   state = { night: 0, ready: false, error: null };
 
-  SHORT = { first:'1H', second:'2H', wild:'WC', event:'EWC' };
+  SHORT = { first:'1H', second:'2H', wild:'SWC', event:'EWC' };
   MARK  = { first:'†', second:'‡', wild:'*', event:'§' };
 
   CONFIG = {
