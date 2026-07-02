@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeflash{0%{opacity:0;transform:translateY(6px)}12%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
+  input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield}
+  ::-webkit-scrollbar{height:8px;width:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(120,120,120,.32);border-radius:8px}
+</style>
+</helmet>
+
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:'Archivo',sans-serif;color:oklch(53% 0.03 250);background:oklch(97.5% 0.012 232)">
+  <div style="width:26px;height:26px;border-radius:50%;border:3px solid oklch(88% 0.02 245);border-top-color:oklch(52% 0.13 245);animation:spin .8s linear infinite"></div>
+  <div style="font-size:13px;letter-spacing:.04em">{{ loadingText }}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;background:oklch(97.5% 0.012 232);color:oklch(29% 0.03 250);font-family:'Archivo',sans-serif;padding-bottom:96px">
+
+  <header style="border-bottom:1px solid oklch(91% 0.016 232);background:#fff">
+    <div style="max-width:640px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+      <div>
+        <div style="font:700 24px 'Saira Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;line-height:1">Enter Draw Shots</div>
+        <div style="font-size:12.5px;color:oklch(52% 0.03 250);margin-top:2px">Mansfield Curling League · {{ season }}</div>
+      </div>
+      <div style="font-size:11px;color:oklch(42% 0.09 152);background:oklch(96% 0.04 152);border:1px solid oklch(88% 0.06 152);border-radius:6px;padding:5px 9px;max-width:220px;line-height:1.4">● Live — one value per team, per season.</div>
+    </div>
+  </header>
+
+  <main style="max-width:640px;margin:0 auto;padding:20px">
+
+    <div style="margin-bottom:18px">
+      <label for="shiftSel" style="display:block;font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:oklch(54% 0.03 250);margin-bottom:7px">League night</label>
+      <div style="position:relative;max-width:320px">
+        <select id="shiftSel" value="{{ shiftName }}" onChange="{{ onShift }}" style="appearance:none;-webkit-appearance:none;width:100%;min-height:50px;font:600 16px 'Archivo',sans-serif;color:oklch(30% 0.03 250);padding:13px 40px 13px 14px;border:1px solid oklch(88% 0.016 232);border-radius:10px;background:#fff;cursor:pointer">
+          <sc-for list="{{ shiftOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+        </select>
+        <span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:oklch(55% 0.03 250);font-size:12px">▾</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 12px">
+      <div style="font:700 20px 'Saira Condensed',sans-serif;letter-spacing:.02em">{{ shiftName }}</div>
+      <div style="font-size:12.5px;color:oklch(50% 0.03 250)"><strong style="color:oklch(30% 0.03 250);font-weight:700">{{ enteredCount }}</strong> of {{ teamCount }} recorded</div>
+    </div>
+
+    <div style="font-size:12px;line-height:1.5;color:oklch(52% 0.03 250);margin-bottom:14px">Measurement in inches from the button — <strong style="color:oklch(38% 0.03 250)">0.0 to 72.0, to the nearest ½″</strong>. Lower is better. Tap <strong style="color:oklch(38% 0.03 250)">X</strong> if a team didn’t complete their draw (ranks last). Leave blank if not thrown yet.</div>
+
+    <!-- team rows -->
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="11">
+        <div style="background:#fff;border:1px solid {{ r.cardBorder }};border-radius:11px;padding:11px 13px;display:flex;align-items:center;gap:12px">
+          <div style="width:22px;font:700 14px 'Saira Condensed',sans-serif;color:oklch(64% 0.02 250);text-align:center">{{ r.no }}</div>
+          <div style="flex:1;min-width:0;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+          <div style="position:relative;width:104px;flex-shrink:0">
+            <input type="text" inputmode="decimal" placeholder="—" value="{{ r.numValue }}" disabled="{{ r.numDisabled }}" onInput="{{ r.onNum }}" onBlur="{{ r.onBlur }}" aria-label="{{ r.ariaNum }}" style="width:100%;min-height:46px;font:600 16px 'Archivo',sans-serif;text-align:right;color:{{ r.numColor }};padding:10px 30px 10px 12px;border:1.5px solid {{ r.inputBorder }};border-radius:9px;background:{{ r.inputBg }}" style-focus="border-color:oklch(60% 0.12 245)">
+            <span aria-hidden="true" style="position:absolute;right:11px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:12px;color:oklch(66% 0.02 250)">in</span>
+          </div>
+          <button onClick="{{ r.toggleX }}" aria-pressed="{{ r.xPressed }}" aria-label="{{ r.ariaX }}" style="width:46px;height:46px;flex-shrink:0;border-radius:9px;border:1.5px solid {{ r.xBorder }};background:{{ r.xBg }};color:{{ r.xFg }};font:700 16px 'Saira Condensed',sans-serif;cursor:pointer" style-hover="border-color:oklch(66% 0.14 27)">X</button>
+        </div>
+        <sc-if value="{{ r.invalid }}" hint-placeholder-val="{{ false }}"><div role="alert" style="margin:-4px 0 2px 34px;font-size:11.5px;color:oklch(50% 0.18 27)">{{ r.error }}</div></sc-if>
+      </sc-for>
+    </div>
+
+  </main>
+
+  <div style="position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid oklch(90% 0.016 232);box-shadow:0 -2px 12px rgba(20,30,45,.05)">
+    <div style="max-width:640px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:12.5px;font-weight:600;color:{{ statusColor }};background:{{ statusBg }};border:1px solid {{ statusBorder }};border-radius:6px;padding:4px 9px">{{ statusText }}</span>
+        <span role="status" aria-live="polite"><sc-if value="{{ flash }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:600;color:oklch(48% 0.13 152);animation:fadeflash 2.2s ease forwards">✓ Saved</span></sc-if></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px">
+        <sc-if value="{{ dirty }}" hint-placeholder-val="{{ false }}"><button onClick="{{ revert }}" style="padding:9px 14px;border-radius:8px;border:1px solid oklch(88% 0.02 250);background:#fff;color:oklch(46% 0.03 250);font-weight:600;font-size:13.5px;cursor:pointer" style-hover="background:oklch(96% 0.012 232)">Revert</button></sc-if>
+        <button onClick="{{ submit }}" disabled="{{ submitDisabled }}" style="padding:10px 22px;border-radius:8px;border:none;background:{{ submitBg }};color:#fff;font-weight:600;font-size:14px;white-space:nowrap;cursor:{{ submitCursor }};opacity:{{ submitOpacity }}" style-hover="filter:brightness(1.05)">{{ submitLabel }}</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { shift:0, draft:{}, ready:false, error:null, flash:false, saving:false };
+
+  componentDidMount(){
+    import('./mansfield-data.js')
+      .then(m => { this.dataLib = m; return m.loadSeason(m.DEFAULT_SEASON); })
+      .then(data=>{ this.build(data); this.setState({ ready:true, draft:this.draftFor(this.shifts[0]) }); })
+      .catch(e=>this.setState({ error:String(e) }));
+  }
+
+  build(data){
+    this.season = data.season;
+    const SHIFT_ORDER=['Tuesday Dinner','Tuesday Late','Wednesday Dinner','Wednesday Late','Thursday Dinner','Thursday Late'];
+    this.shifts = data.shifts.slice().sort((a,b)=>{ const ia=SHIFT_ORDER.indexOf(a), ib=SHIFT_ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+    this.orig = {};                        // shift -> { team_no: rawValue }
+    this.rosters = {};                     // shift -> [{no,name}]
+    this.shifts.forEach(s=>{ this.orig[s]={}; this.rosters[s]=[]; });
+    data.teams.forEach(t=>{
+      this.rosters[t.shift].push({ no:t.team_no, name:t.name });
+      this.orig[t.shift][t.team_no] = this.norm(t.draw);
+    });
+    this.shifts.forEach(s=> this.rosters[s].sort((a,b)=>a.no-b.no));
+  }
+
+  // normalize a stored value to a canonical raw string: '', 'X', or a number-string
+  norm(v){
+    if(v==null || v==='') return '';
+    const s=String(v).trim().toUpperCase();
+    if(s==='X') return 'X';
+    const n=Number(s);
+    return isNaN(n) ? 'X' : String(n);
+  }
+  draftFor(shift){
+    const d={...this.orig[shift]};
+    Object.keys(d).forEach(no=>{ const v=d[no]; if(v!=='' && v!=='X' && this.isValidNum(v)) d[no]=Number(v).toFixed(1); });
+    return d;
+  }
+  curShift(){ return this.shifts[this.state.shift]; }
+
+  isValidNum(v){ if(v==='') return true; const n=Number(v); return !isNaN(n) && n>=0 && n<=72 && Math.abs(n*2 - Math.round(n*2))<1e-9; }
+  rowValid(raw){ return raw==='X' || this.isValidNum(raw); }
+
+  onShift(e){ const i=this.shifts.indexOf(e.target.value); if(i>=0) this.setState({ shift:i, draft:this.draftFor(this.shifts[i]), flash:false, error:null }); }
+  onNum(no, e){
+    const d={...this.state.draft}; d[no]=e.target.value; this.setState({ draft:d, flash:false });
+  }
+  onBlur(no, e){
+    const raw = e && e.target ? e.target.value : this.state.draft[no];
+    if(raw!==undefined && raw!=='' && raw!=='X' && this.isValidNum(raw)){
+      const d={...this.state.draft}; d[no]=Number(raw).toFixed(1); this.setState({ draft:d });
+    }
+  }
+  toggleX(no){
+    const d={...this.state.draft}; d[no] = d[no]==='X' ? '' : 'X'; this.setState({ draft:d, flash:false });
+  }
+  revert(){ this.setState({ draft:this.draftFor(this.curShift()), flash:false, error:null }); }
+
+  async submit(){
+    const shift=this.curShift(), draft=this.state.draft, orig=this.orig[shift];
+    const changes=[];
+    this.rosters[shift].forEach(t=>{
+      const cur=this.norm(orig[t.no]||''), next=this.norm(draft[t.no]||'');
+      if(cur!==next && this.rowValid(draft[t.no]||'')) changes.push({ no:t.no, value: next==='' ? null : next });
+    });
+    if(!changes.length){ this.setState({ flash:true }); return; }
+    this.setState({ saving:true, error:null });
+    try{
+      await Promise.all(changes.map(c=> this.dataLib.setDraw(this.season, shift, c.no, c.value)));
+      changes.forEach(c=>{ orig[c.no] = c.value==null ? '' : c.value; });
+      this.setState({ saving:false, flash:true });
+    }catch(e){ this.setState({ saving:false, error:'Save failed — '+String(e) }); }
+  }
+
+  renderVals(){
+    if(!this.state.ready){
+      return { loading:true, ready:false, loadingText: this.state.error ? ('Could not load data — '+this.state.error) : 'Loading roster…' };
+    }
+    const ACC='oklch(52% 0.13 245)', RED='oklch(58% 0.19 27)';
+    const shift=this.curShift();
+    const draft=this.state.draft, orig=this.orig[shift];
+    const roster=this.rosters[shift];
+
+    let anyInvalid=false, enteredCount=0;
+    const rows=roster.map(t=>{
+      const raw = draft[t.no]===undefined ? '' : draft[t.no];
+      const isX = raw==='X';
+      const valid = this.rowValid(raw);
+      if(!valid) anyInvalid=true;
+      if(raw!=='' ) enteredCount++;
+      return {
+        no:t.no, name:t.name,
+        numValue: isX ? '' : raw,
+        numDisabled: isX ? 'true' : '',
+        numColor: isX ? 'oklch(75% 0.02 250)' : 'oklch(30% 0.03 250)',
+        inputBorder: !valid ? RED : (isX ? 'oklch(90% 0.016 232)' : 'oklch(88% 0.016 232)'),
+        inputBg: isX ? 'oklch(97% 0.008 250)' : '#fff',
+        onNum:(e)=>this.onNum(t.no,e),
+        onBlur:(e)=>this.onBlur(t.no, e),
+        toggleX:()=>this.toggleX(t.no),
+        xPressed: isX ? 'true':'false',
+        xBorder: isX ? RED : 'oklch(89% 0.016 232)',
+        xBg: isX ? RED : '#fff',
+        xFg: isX ? '#fff' : 'oklch(60% 0.03 250)',
+        cardBorder: !valid ? RED : 'oklch(91% 0.016 232)',
+        invalid: !valid,
+        error: 'Enter 0.0–72.0 to the nearest ½″, or X',
+        ariaNum: t.name+' draw measurement, inches',
+        ariaX: t.name+(isX?' marked did-not-complete, tap to clear':' — tap to mark did not complete'),
+      };
+    });
+
+    const dirty = roster.some(t=> this.norm(orig[t.no]||'') !== this.norm(draft[t.no]||''));
+    const hasValidChanges = roster.some(t=>{ const raw = draft[t.no]===undefined?'':draft[t.no]; return this.norm(orig[t.no]||'') !== this.norm(raw) && this.rowValid(raw); });
+    let statusText, sc, sbg, sbd;
+    if(this.state.saving){ statusText='Saving…'; sc='oklch(45% 0.09 250)'; sbg='oklch(96% 0.03 250)'; sbd='oklch(88% 0.04 250)'; }
+    else if(this.state.error){ statusText='Save failed'; sc='oklch(50% 0.18 27)'; sbg='oklch(96% 0.05 27)'; sbd='oklch(86% 0.08 27)'; }
+    else if(hasValidChanges){ statusText='Unsaved changes'; sc='oklch(48% 0.1 70)'; sbg='oklch(96% 0.05 80)'; sbd='oklch(88% 0.06 80)'; }
+    else if(anyInvalid){ statusText='Fix invalid value'; sc='oklch(50% 0.18 27)'; sbg='oklch(96% 0.05 27)'; sbd='oklch(86% 0.08 27)'; }
+    else { statusText='All saved'; sc='oklch(40% 0.13 152)'; sbg='oklch(95% 0.05 152)'; sbd='oklch(85% 0.06 152)'; }
+
+    const canSubmit = hasValidChanges && !this.state.saving;
+    return {
+      loading:false, ready:true, season:this.season,
+      shiftName:shift, weekN:0,
+      onShift:(e)=>this.onShift(e),
+      shiftOptions:this.shifts.map(s=>({value:s,label:s})),
+      rows, teamCount:roster.length, enteredCount,
+      statusText, statusColor:sc, statusBg:sbg, statusBorder:sbd,
+      dirty, flash:this.state.flash,
+      submit:()=>this.submit(), revert:()=>this.revert(),
+      submitLabel: this.state.saving?'Saving…':'Save draws',
+      submitDisabled: canSubmit ? '' : 'true',
+      submitBg: canSubmit?ACC:'oklch(80% 0.02 250)', submitCursor:canSubmit?'pointer':'default', submitOpacity:canSubmit?'1':'.7',
+    };
+  }
+}
+</script>
+</body>
+</html>

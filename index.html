@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&family=Playfair+Display:wght@700;800;900&family=Spectral:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  ::-webkit-scrollbar{height:8px;width:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(120,120,120,.35);border-radius:8px}
+</style>
+</helmet>
+
+<!-- ==================== LOADING ==================== -->
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:'Archivo',sans-serif;color:oklch(53% 0.03 250);background:oklch(97.5% 0.012 232)">
+  <div style="width:26px;height:26px;border-radius:50%;border:3px solid oklch(88% 0.02 245);border-top-color:oklch(52% 0.13 245);animation:spin .8s linear infinite"></div>
+  <div style="font-size:13px;letter-spacing:.04em">{{ loadingText }}</div>
+</div>
+</sc-if>
+
+<!-- ==================== SPORTY ==================== -->
+<sc-if value="{{ isSporty }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;background:oklch(97.5% 0.012 232);color:oklch(29% 0.03 250);font-family:'Archivo',sans-serif">
+  <header style="border-bottom:1px solid oklch(91% 0.016 232);background:#fff">
+    <div style="max-width:920px;margin:0 auto;padding:18px 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:38px;height:38px;border-radius:50%;border:3px solid oklch(52% 0.13 245);position:relative;flex-shrink:0"><div style="position:absolute;inset:11px;border-radius:50%;background:oklch(52% 0.13 245)"></div></div>
+        <div><div style="font:700 30px 'Saira Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;line-height:.95">Mansfield</div><div style="font:600 13px 'Saira Condensed',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:oklch(52% 0.13 245)">Curling League · Standings</div></div>
+      </div>
+      <div style="text-align:right;font-size:12px;line-height:1.5;color:oklch(53% 0.03 250)"><div style="font-weight:600;color:oklch(29% 0.03 250)">{{ season }}</div><div>Computed live from logged games</div></div>
+    </div>
+  </header>
+  <div style="max-width:920px;margin:0 auto;padding:0 22px"><nav style="display:flex;gap:6px;overflow-x:auto;padding:16px 0 14px">
+    <sc-for list="{{ tabsSporty }}" as="tab" hint-placeholder-count="6"><button onClick="{{ tab.select }}" style="padding:8px 15px;border-radius:999px;border:1px solid;font:600 15px 'Saira Condensed',sans-serif;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;cursor:pointer;background:{{ tab.bg }};color:{{ tab.fg }};border-color:{{ tab.bc }}" style-hover="background:{{ tab.hover }}">{{ tab.label }}</button></sc-for>
+  </nav></div>
+  <main style="max-width:920px;margin:0 auto;padding:0 22px 56px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 16px"><h1 style="margin:0;font:700 34px 'Saira Condensed',sans-serif;letter-spacing:.01em">{{ nightName }}</h1><div style="font-size:13px;color:oklch(53% 0.03 250);font-weight:500">{{ teamCount }} teams · {{ meta }}</div></div>
+    <div style="background:#fff;border:1px solid oklch(91% 0.016 232);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(20,30,45,.04)"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:620px">
+      <thead><tr style="font:600 12px 'Saira Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:oklch(53% 0.03 250);background:oklch(96.5% 0.013 232)"><th style="padding:11px 8px;width:46px">#</th><th style="text-align:left;padding:11px 12px">Team</th><th style="padding:11px 10px;width:50px">W</th><th style="padding:11px 10px;width:50px">L</th><th style="padding:11px 12px;width:66px">Pct</th><th style="padding:11px 12px;width:58px">Draw</th><th style="padding:11px 12px;width:118px">Last 5</th><th style="padding:11px 12px;width:62px">Strk</th></tr></thead>
+      <tbody><sc-for list="{{ sporty }}" as="t" hint-placeholder-count="13"><tr style="border-top:1px solid oklch(94% 0.014 232);background:{{ t.rowTint }}">
+        <td style="text-align:center;padding:11px 8px;box-shadow:inset 3px 0 0 {{ t.bar }}"><span style="font:700 18px 'Saira Condensed',sans-serif">{{ t.rank }}</span></td>
+        <td style="padding:11px 12px"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-weight:600;font-size:15px">{{ t.name }}</span><sc-if value="{{ t.hasBerth }}" hint-placeholder-val="{{ true }}"><span style="font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.07em;padding:2px 7px;border-radius:5px;color:{{ t.berthColor }};background:{{ t.berthSoft }}">{{ t.berthShort }}</span></sc-if></div></td>
+        <td style="text-align:center;padding:11px 10px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">{{ t.w }}</td>
+        <td style="text-align:center;padding:11px 10px;font-size:15px;font-variant-numeric:tabular-nums;color:oklch(53% 0.03 250)">{{ t.l }}</td>
+        <td style="text-align:center;padding:11px 12px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">{{ t.pct }}</td>
+        <td style="text-align:center;padding:11px 12px;font-size:15px;font-variant-numeric:tabular-nums;color:{{ t.drawColor }}">{{ t.drawText }}</td>
+        <td style="padding:11px 12px"><div style="display:flex;gap:5px;justify-content:center"><sc-for list="{{ t.l5 }}" as="d" hint-placeholder-count="5"><span style="width:10px;height:10px;border-radius:50%;background:{{ d.color }}"></span></sc-for></div></td>
+        <td style="text-align:center;padding:11px 12px"><span style="font:700 14px 'Saira Condensed',sans-serif;color:{{ t.streakColor }}">{{ t.streakText }}</span></td>
+      </tr></sc-for></tbody>
+    </table></div></div>
+    <section style="margin-top:22px;background:#fff;border:1px solid oklch(91% 0.016 232);border-radius:12px;padding:18px 20px">
+      <div style="font:700 13px 'Saira Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:oklch(53% 0.03 250);margin-bottom:14px">Playoff Qualification</div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap">
+        <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(52% 0.13 152)"></span><div><div style="font-weight:600;font-size:14px">1st Half · 1H</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Top finisher(s) of the first half.</div></div></div>
+        <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(53% 0.13 248)"></span><div><div style="font-weight:600;font-size:14px">2nd Half · 2H</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Top finisher(s) of the second half.</div></div></div>
+        <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(60% 0.13 66)"></span><div><div style="font-weight:600;font-size:14px">Wild Card · WC</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Best remaining on shift (Wed Late only).</div></div></div>
+        <div style="display:flex;gap:10px;max-width:200px"><span style="width:14px;height:14px;border-radius:4px;margin-top:2px;background:oklch(55% 0.13 300)"></span><div><div style="font-weight:600;font-size:14px">Event WC · EWC</div><div style="font-size:12.5px;line-height:1.45;color:oklch(53% 0.03 250)">Best remaining records league-wide.</div></div></div>
+      </div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid oklch(91% 0.016 232);font-size:12.5px;line-height:1.5;color:oklch(53% 0.03 250)"><strong style="color:oklch(29% 0.03 250);font-weight:600">Tiebreakers:</strong> overall record, then head-to-head, then draw shot, then coin flip. <strong style="color:oklch(29% 0.03 250);font-weight:600">Draw</strong> = draw-shot measurement (inches from the button, lower is better); <span style="color:oklch(58% 0.16 27);font-weight:600">X</span> or – means not yet recorded and ranks last.</div>
+    </section>
+  </main>
+</div>
+</sc-if>
+
+<!-- ==================== LEDGER ==================== -->
+<sc-if value="{{ isLedger }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;background:#f4efe2;color:#23211a;font-family:'Spectral',serif;padding:30px 20px 60px">
+  <div style="max-width:720px;margin:0 auto">
+    <div style="text-align:center;border-bottom:3px double #23211a;padding-bottom:12px">
+      <div style="font:400 11px 'Spectral',serif;letter-spacing:.32em;text-transform:uppercase">Vol. XII · No. 14 · Est. MMXIV</div>
+      <div style="font:900 56px 'Playfair Display',serif;line-height:1.0;margin:4px 0">The Mansfield Ledger</div>
+      <div style="font:500 12px 'Spectral',serif;letter-spacing:.16em;text-transform:uppercase">Curling League Standings — Season Final</div>
+    </div>
+    <nav style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;padding:14px 0;border-bottom:1px solid #b8ae96">
+      <sc-for list="{{ tabsLedger }}" as="tab" hint-placeholder-count="6"><button onClick="{{ tab.select }}" style="padding:5px 12px;border:none;cursor:pointer;font:600 13px 'Spectral',serif;letter-spacing:.04em;background:{{ tab.bg }};color:{{ tab.fg }}" style-hover="background:#e6dfcd">{{ tab.label }}</button></sc-for>
+    </nav>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin:16px 0 4px"><h1 style="margin:0;font:800 30px 'Playfair Display',serif">{{ nightName }}</h1><div style="font:400 12px 'Spectral',serif;letter-spacing:.06em">{{ teamCount }} rinks · {{ meta }}</div></div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="font:600 10px 'Spectral',serif;letter-spacing:.18em;text-transform:uppercase;color:#6f6750;border-bottom:1px solid #b8ae96"><th style="text-align:left;padding:8px 4px">Rk</th><th style="text-align:left;padding:8px 4px">Rink</th><th style="text-align:right;padding:8px 4px">W</th><th style="text-align:right;padding:8px 4px">L</th><th style="text-align:right;padding:8px 4px">Pct</th><th style="text-align:right;padding:8px 4px">Draw</th><th style="text-align:right;padding:8px 4px">Strk</th><th style="text-align:right;padding:8px 4px">Form</th></tr></thead>
+      <tbody><sc-for list="{{ ledger }}" as="t" hint-placeholder-count="13"><tr style="border-bottom:1px solid #e0d8c5">
+        <td style="padding:8px 4px;font:600 15px 'Playfair Display',serif">{{ t.rank }}</td>
+        <td style="padding:8px 4px"><span style="font-weight:600;font-size:16px">{{ t.name }}</span><span style="font-size:13px;color:#6f6750"> {{ t.berthMark }}</span></td>
+        <td style="text-align:right;padding:8px 4px;font-size:15px;font-variant-numeric:tabular-nums oldstyle-nums">{{ t.w }}</td>
+        <td style="text-align:right;padding:8px 4px;font-size:15px;color:#6f6750;font-variant-numeric:tabular-nums oldstyle-nums">{{ t.l }}</td>
+        <td style="text-align:right;padding:8px 4px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums oldstyle-nums">{{ t.pct }}</td>
+        <td style="text-align:right;padding:8px 4px;font-size:13px;font-style:italic;font-variant-numeric:oldstyle-nums;color:{{ t.drawColor }}">{{ t.drawText }}</td>
+        <td style="text-align:right;padding:8px 4px;font:700 13px 'Space Mono',monospace;color:{{ t.streakColor }}">{{ t.streakText }}</td>
+        <td style="text-align:right;padding:8px 4px;font:400 11px 'Space Mono',monospace;letter-spacing:.1em;color:#4a4536">{{ t.l5str }}</td>
+      </tr></sc-for></tbody>
+    </table>
+    <div style="margin-top:12px;border-top:1px solid #b8ae96;padding-top:10px;font:400 12px/1.55 'Spectral',serif;color:#4a4536"><em>† First-half berth&nbsp;&nbsp; ‡ Second-half berth&nbsp;&nbsp; * Shift wild card&nbsp;&nbsp; § Event wild card.</em> Ties: overall record, then head-to-head, then draw shot. <em>Draw</em> = draw-shot inches from the button (lower better); <span style="color:#9a3b2e">X</span> or – not yet recorded.</div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ==================== BROADCAST ==================== -->
+<sc-if value="{{ isBroadcast }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;background:#080b10;color:#e8edf4;font-family:'Space Mono',monospace;padding:26px 20px 60px">
+  <div style="max-width:780px;margin:0 auto;position:relative;background:#0b0e13;border:1px solid #1b212c;border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.4);overflow:hidden">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.18) 2px 4px);pointer-events:none;z-index:3"></div>
+    <div style="padding:18px 22px;border-bottom:1px solid #1b212c;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:oklch(72% 0.2 38);animation:pulse 1.4s infinite"></span><span style="font:700 15px 'Saira Condensed',sans-serif;letter-spacing:.2em;color:#cdd6e2">LIVE · MANSFIELD CURLING</span></div>
+      <span style="font:700 13px 'Saira Condensed',sans-serif;letter-spacing:.14em;color:oklch(80% 0.19 150)">{{ seasonShort }}</span>
+    </div>
+    <nav style="display:flex;gap:6px;overflow-x:auto;padding:14px 22px;border-bottom:1px solid #1b212c;position:relative;z-index:4">
+      <sc-for list="{{ tabsBroadcast }}" as="tab" hint-placeholder-count="6"><button onClick="{{ tab.select }}" style="padding:6px 13px;border-radius:6px;border:1px solid {{ tab.bc }};cursor:pointer;font:700 12px 'Saira Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;background:{{ tab.bg }};color:{{ tab.fg }}" style-hover="background:{{ tab.hover }}">{{ tab.label }}</button></sc-for>
+    </nav>
+    <div style="padding:14px 22px 6px;display:flex;align-items:baseline;justify-content:space-between"><div style="font:700 24px 'Saira Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff">{{ nightName }}</div><div style="font-size:12px;color:#5b6675">{{ teamCount }} TEAMS · {{ metaShort }}</div></div>
+    <div style="padding:4px 0 10px">
+      <sc-for list="{{ broadcast }}" as="t" hint-placeholder-count="13"><div style="display:flex;align-items:center;gap:11px;padding:7px 22px;box-shadow:inset 3px 0 0 {{ t.bar }};background:{{ t.rowTint }}">
+        <span style="width:24px;font:700 16px 'Space Mono',monospace;color:#5b6675;text-align:right">{{ t.rank }}</span>
+        <span style="flex:1;font-weight:700;font-size:15px;letter-spacing:.02em;color:#e8edf4">{{ t.name }}</span>
+        <sc-if value="{{ t.hasBerth }}" hint-placeholder-val="{{ true }}"><span style="font:700 10px 'Saira Condensed',sans-serif;letter-spacing:.08em;padding:1px 6px;border-radius:3px;color:{{ t.berthColor }};background:{{ t.berthSoft }}">{{ t.berthShort }}</span></sc-if>
+        <span style="font-size:15px;font-weight:700;letter-spacing:.04em;color:oklch(80% 0.19 150)">{{ t.w }}<span style="color:#444e5c">-</span><span style="color:#8a93a0">{{ t.l }}</span></span>
+        <span style="width:42px;text-align:right;font:400 12px 'Space Mono',monospace;color:{{ t.drawColor }}">{{ t.drawText }}</span>
+        <div style="display:flex;gap:3px;width:66px;justify-content:flex-end"><sc-for list="{{ t.l5 }}" as="d" hint-placeholder-count="5"><span style="width:9px;height:9px;border-radius:2px;background:{{ d.color }}"></span></sc-for></div>
+        <span style="width:34px;text-align:right;font-weight:700;font-size:14px;color:{{ t.streakColor }}">{{ t.streakText }}</span>
+      </div></sc-for>
+    </div>
+    <div style="padding:11px 22px;border-top:1px solid #1b212c;font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.1em;display:flex;gap:14px;flex-wrap:wrap;position:relative;z-index:4"><span style="color:oklch(82% 0.18 150)">■ 1H</span><span style="color:oklch(80% 0.13 210)">■ 2H</span><span style="color:oklch(84% 0.16 88)">■ WC</span><span style="color:oklch(72% 0.16 310)">■ EWC</span><span style="color:#5b6675;margin-left:auto">DRAW = TIEBREAK (IN) · LOW BEST</span></div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ==================== BRUTALIST ==================== -->
+<sc-if value="{{ isBrutal }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;background:#f1f1ec;color:#0c0c0a;font-family:'Archivo',sans-serif;padding:30px 20px 70px">
+  <div style="max-width:760px;margin:0 auto;border:2px solid #0c0c0a;box-shadow:10px 10px 0 #0c0c0a;background:#f1f1ec">
+    <div style="background:#0c0c0a;color:#f1f1ec;padding:18px 22px;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="font:700 44px 'Archivo',sans-serif;letter-spacing:-.03em;line-height:.85">MANSFIELD</div>
+      <div style="font:700 14px 'Space Mono',monospace;color:oklch(64% 0.21 28)">STANDINGS · {{ seasonShort }}</div>
+    </div>
+    <nav style="display:flex;gap:0;flex-wrap:wrap;border-bottom:2px solid #0c0c0a">
+      <sc-for list="{{ tabsBrutal }}" as="tab" hint-placeholder-count="6"><button onClick="{{ tab.select }}" style="padding:9px 14px;border:none;border-right:2px solid #0c0c0a;cursor:pointer;font:700 12px 'Archivo',sans-serif;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;background:{{ tab.bg }};color:{{ tab.fg }}" style-hover="background:{{ tab.hover }}">{{ tab.label }}</button></sc-for>
+    </nav>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 22px 6px"><div style="font:700 26px 'Archivo',sans-serif;text-transform:uppercase;letter-spacing:-.01em">{{ nightName }}</div><div style="font:700 12px 'Space Mono',monospace;color:#6a6a63">{{ teamCount }} TEAMS / {{ metaShort }}</div></div>
+    <sc-for list="{{ brutal }}" as="t" hint-placeholder-count="13"><div style="display:flex;align-items:center;gap:14px;padding:9px 22px;border-top:2px solid #0c0c0a;border-left:8px solid {{ t.slab }}">
+      <span style="width:42px;font:700 32px 'Archivo',sans-serif;letter-spacing:-.04em;text-align:right">{{ t.rank }}</span>
+      <div style="flex:1;min-width:0"><div style="font:700 17px 'Archivo',sans-serif;text-transform:uppercase;letter-spacing:-.01em">{{ t.name }}</div><div style="display:flex;gap:3px;margin-top:4px"><sc-for list="{{ t.l5 }}" as="d" hint-placeholder-count="5"><span style="width:9px;height:9px;background:{{ d.color }};border:1.5px solid #0c0c0a"></span></sc-for></div></div>
+      <span style="font:700 24px 'Space Mono',monospace;font-variant-numeric:tabular-nums">{{ t.w }}<span style="color:#b8b8b1">–</span>{{ t.l }}</span>
+      <span style="width:44px;text-align:right;font:700 13px 'Space Mono',monospace;color:{{ t.drawColor }}">{{ t.drawText }}</span>
+      <sc-if value="{{ t.hasBerth }}" hint-placeholder-val="{{ true }}"><span style="font:700 11px 'Space Mono',monospace;background:{{ t.berthSoft }};color:#0c0c0a;padding:2px 7px">{{ t.berthShort }}</span></sc-if>
+    </div></sc-for>
+    <div style="border-top:2px solid #0c0c0a;padding:12px 22px;font:700 11px 'Space Mono',monospace;letter-spacing:.04em;display:flex;gap:16px;flex-wrap:wrap"><span>■ 1H</span><span>■ 2H</span><span>■ WC</span><span>■ EWC</span><span style="color:oklch(64% 0.21 28)">▌ PLAYOFF FIELD</span><span style="margin-left:auto">DRAW = TIEBREAK (IN)</span></div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;skin&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sporty&quot;,&quot;ledger&quot;,&quot;broadcast&quot;,&quot;brutalist&quot;],&quot;default&quot;:&quot;sporty&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;highlightPlayoffs&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Appearance&quot;}}">
+class Component extends DCLogic {
+  state = { night: 0, ready: false, error: null };
+
+  SHORT = { first:'1H', second:'2H', wild:'WC', event:'EWC' };
+  MARK  = { first:'†', second:'‡', wild:'*', event:'§' };
+
+  CONFIG = {
+    'Tuesday Dinner':   { first:'two', second:'two', wc:0 },
+    'Tuesday Late':     { first:'one', second:'one', wc:0 },
+    'Wednesday Dinner': { first:'two', second:'two', wc:0 },
+    'Wednesday Late':   { first:'two', second:'two', wc:2 },
+    'Thursday Dinner':  { first:'two', second:'two', wc:0 },
+    'Thursday Late':    { first:'two', second:'two', wc:0 },
+  };
+
+  componentDidMount(){
+    import('./mansfield-data.js')
+      .then(m => m.loadSeason(m.DEFAULT_SEASON))
+      .then(data=>{ this.build(data); this.setState({ ready:true }); })
+      .catch(e=>{ this.setState({ error:String(e) }); });
+  }
+
+  // ---------- derive records / h2h from games ----------
+  build(data){
+    this.season = data;
+    const SHIFT_ORDER=['Tuesday Dinner','Tuesday Late','Wednesday Dinner','Wednesday Late','Thursday Dinner','Thursday Late'];
+    this.shifts = data.shifts.slice().sort((a,b)=>{ const ia=SHIFT_ORDER.indexOf(a), ib=SHIFT_ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+    const stat = {}; const teamsByShift = {};
+    data.shifts.forEach(s=>teamsByShift[s]=[]);
+    const K=(shift,name)=>shift+'\u241F'+name; this._K=K;
+    data.teams.forEach(t=>{ stat[K(t.shift,t.name)]={ name:t.name, shift:t.shift, fh:{w:0,l:0}, sh:{w:0,l:0}, overall:{w:0,l:0}, results:[], h2h:{season:{},half1:{},half2:{}} }; teamsByShift[t.shift].push(K(t.shift,t.name)); });
+    const bump=(m,opp,win)=>{ if(!m[opp])m[opp]={w:0,l:0}; if(win)m[opp].w++; else m[opp].l++; };
+    const games = data.games.slice().sort((a,b)=>a.week-b.week);
+    for(const g of games){
+      if(g.winner==null) continue; // unplayed / not entered yet — contributes nothing
+      const winner=g.winner, loser=(g.a===winner?g.b:g.a);
+      const wHalf = this.halfForTeam(data, winner, g.shift, g.week);
+      const lHalf = this.halfForTeam(data, loser,  g.shift, g.week);
+      const wk = wHalf==='half1' ? 'fh' : 'sh';
+      const lk = lHalf==='half1' ? 'fh' : 'sh';
+      const W=stat[K(g.shift,winner)], L=stat[K(g.shift,loser)];
+      W.overall.w++; L.overall.l++; W[wk].w++; L[lk].l++;
+      W.results.push('W'); L.results.push('L');
+      bump(W.h2h.season,loser,true); bump(L.h2h.season,winner,false);
+      bump(W.h2h[wHalf],loser,true); bump(L.h2h[lHalf],winner,false);
+    }
+    const drawMap={}; data.draws.forEach(d=>drawMap[K(d.shift,d.team)]=d.val);
+    this.stat=stat; this.teamsByShift=teamsByShift; this.drawMap=drawMap;
+    // engine objects + global h2h
+    this.h2hGlobal={}; const objByShift={}; const allObjs=[];
+    data.shifts.forEach(s=>objByShift[s]=[]);
+    for(const key in stat){ const st=stat[key]; const o={ key, name:st.name, shift:st.shift, fh:st.fh, sh:st.sh, overall:st.overall, draw:drawMap[key] }; objByShift[st.shift].push(o); allObjs.push(o); this.h2hGlobal[key]=st.h2h; }
+    this.berthOf = this.determineBerths(objByShift, allObjs);
+  }
+
+  // half a given team's week belongs to. Standard shifts: uniform number.
+  // Wednesday Late: per-team object {team: firstHalfEndsWeek}. Falls back to 9.
+  halfForTeam(data, team, shift, week){
+    const hb = data.halfBreak ? data.halfBreak[shift] : 9;
+    const brk = (hb && typeof hb === 'object') ? (hb[team] ?? 9) : (hb ?? 9);
+    return week <= brk ? 'half1' : 'half2';
+  }
+
+  // ---------- tiebreaker engine (validated in Tiebreaker Scenarios) ----------
+  gb(a,b){ return ((a.w-b.w)+(b.l-a.l))/2; }
+  drawVal(d){ return (d==='X'||d==='-'||d==='–'||d==null) ? Infinity : d; }
+  survivors(set, get){ return set.filter(x => !set.some(y => y!==x && this.gb(get(y),get(x))>=1)); }
+  h2hAgg(set, scope, h2h){
+    const agg={}; let allMet=true;
+    for(const x of set){ let w=0,l=0; for(const o of set){ if(o===x)continue; const m=((h2h[x.key]||{})[scope]||{})[o.name]||{w:0,l:0}; w+=m.w; l+=m.l; } agg[x.key]={w,l}; }
+    for(let i=0;i<set.length;i++)for(let j=i+1;j<set.length;j++){ const a=set[i],b=set[j]; const m=((h2h[a.key]||{})[scope]||{})[b.name]||{w:0,l:0}; if((m.w+m.l)===0) allMet=false; }
+    return {agg, allMet};
+  }
+  halfCrit(half){ return [ {key:'overall'}, {key:'h2h',scope:half}, {key:'h2h',scope:'season'}, {key:'draw'}, {key:'coin'} ]; }
+  wcCrit(){ return [ {key:'overall'}, {key:'h2h',scope:'season'}, {key:'draw'}, {key:'coin'} ]; }
+  eventCrit(){ return [ {key:'overall'}, {key:'draw'}, {key:'coin'} ]; }
+  selectBest(pool, basisGet, criteria, h2h){
+    let c = this.survivors(pool, basisGet);
+    if(c.length<=1) return { winner:c[0] };
+    for(const crit of criteria){
+      if(crit.key==='overall'){ const s=this.survivors(c, t=>t.overall); if(s.length===1) return {winner:s[0]}; c=s; }
+      else if(crit.key==='h2h'){ const {agg,allMet}=this.h2hAgg(c, crit.scope, h2h); if(allMet){ const s=this.survivors(c, t=>agg[t.key]); if(s.length===1) return {winner:s[0]}; c=s; } }
+      else if(crit.key==='draw'){ const min=Math.min(...c.map(t=>this.drawVal(t.draw))); const s=c.filter(t=>this.drawVal(t.draw)===min); if(s.length===1) return {winner:s[0]}; c=s; }
+      else if(crit.key==='coin'){ return { coin:true, tied:c }; }
+    }
+    return { coin:true, tied:c };
+  }
+  determineBerths(objByShift, allObjs){
+    const qualified=new Set(); const berthOf={}; const coin=new Set();
+    const take=(sel,type)=>{ if(!sel) return; const pick=sel.winner||(sel.tied&&sel.tied[0]); if(!pick) return; qualified.add(pick.key); berthOf[pick.key]=type; if(sel.coin) coin.add(pick.key); };
+    const avail=arr=>arr.filter(o=>!qualified.has(o.key));
+    for(const shift of this.shifts){
+      const cfg=this.CONFIG[shift]; const pool=objByShift[shift];
+      take(this.selectBest(avail(pool), o=>o.fh, this.halfCrit('half1'), this.h2hGlobal), 'first');
+      if(cfg.first==='two') take(this.selectBest(avail(pool), o=>o.fh, this.halfCrit('half1'), this.h2hGlobal), 'first');
+      take(this.selectBest(avail(pool), o=>o.sh, this.halfCrit('half2'), this.h2hGlobal), 'second');
+      if(cfg.second==='two') take(this.selectBest(avail(pool), o=>o.sh, this.halfCrit('half2'), this.h2hGlobal), 'second');
+      for(let i=0;i<cfg.wc;i++) take(this.selectBest(avail(pool), o=>o.overall, this.wcCrit(), this.h2hGlobal), 'wild');
+    }
+    for(let i=0;i<4;i++) take(this.selectBest(avail(allObjs), o=>o.overall, this.eventCrit(), this.h2hGlobal), 'event');
+    this.coinSet=coin;
+    return berthOf;
+  }
+
+  // ---------- display helpers ----------
+  pct(w,l){ const g=w+l; if(!g) return '.000'; const v=w/g; return v>=1?'1.000':v.toFixed(3).replace(/^0/,''); }
+  streakArr(arr){ if(!arr.length) return {text:'–',win:true}; const last=arr[arr.length-1]; let k=0; for(let i=arr.length-1;i>=0&&arr[i]===last;i--)k++; return {text:last+k,win:last==='W'}; }
+
+  standingsFor(shift){
+    const rows = this.teamsByShift[shift].map(key=>{ const st=this.stat[key]; return { name:st.name, w:st.overall.w, l:st.overall.l, results:st.results, draw:this.drawMap[key], berth:this.berthOf[key]||null }; });
+    rows.sort((a,b)=>{ const pa=a.w/((a.w+a.l)||1), pb=b.w/((b.w+b.l)||1); if(pb!==pa) return pb-pa; if(b.w!==a.w) return b.w-a.w; return a.l-b.l; });
+    return rows;
+  }
+
+  makeTeams(rows, pal){
+    return rows.map((row,i)=>{
+      const { name, w, l, results, draw, berth } = row;
+      const b = berth ? pal.berth[berth] : null;
+      const last5 = results.slice(-5);
+      const st = this.streakArr(results);
+      const isX = draw==='X'; const isMissing = (draw==null || draw==='-' || draw==='–');
+      const drawText = isX ? 'X' : (isMissing ? '–' : Number(draw).toFixed(1));
+      const drawColor = isX ? pal.drawX : (isMissing ? pal.drawWeak : pal.drawNormal);
+      return {
+        drawText, drawColor,
+        rank:i+1, name, w, l, pct:this.pct(w,l),
+        l5: last5.map(c=>({ color: c==='W'?pal.winDot:pal.lossDot })),
+        l5str: last5.join(' '),
+        streakText: st.text, streakColor: st.win?pal.sWin:pal.sLoss,
+        hasBerth:!!b, berthShort: berth?this.SHORT[berth]:'', berthMark: berth?this.MARK[berth]:'',
+        berthColor: b?b.c:'transparent', berthSoft: b?b.s:'transparent',
+        rowTint:(pal.tint&&b)?b.s:'transparent', bar:(pal.bar&&b)?b.c:'transparent',
+        slab: b?'oklch(64% 0.21 28)':'#0c0c0a',
+      };
+    });
+  }
+
+  makeTabs(pal){
+    return this.shifts.map((name,i)=>{
+      const a = i===this.state.night;
+      return { label:name, select:()=>this.setState({night:i}),
+        bg:a?pal.aBg:pal.iBg, fg:a?pal.aFg:pal.iFg, bc:a?pal.aBc:pal.iBc, hover:a?pal.aBg:pal.hBg };
+    });
+  }
+
+  renderVals(){
+    const skin = this.props.skin ?? 'sporty';
+    const hl = this.props.highlightPlayoffs ?? true;
+    const ready = this.state.ready && !!this.berthOf;
+
+    if(!ready){
+      return { loading:true, loadingText: this.state.error ? ('Could not load season.json — '+this.state.error) : 'Loading standings…',
+        isSporty:false, isLedger:false, isBroadcast:false, isBrutal:false };
+    }
+
+    const SP = { winDot:'oklch(56% 0.12 150)', lossDot:'oklch(85% 0.016 250)', sWin:'#1f8a4d', sLoss:'#c0392b', tint:hl, bar:hl,
+      drawNormal:'oklch(48% 0.03 250)', drawWeak:'oklch(80% 0.02 250)', drawX:'oklch(58% 0.16 27)',
+      berth:{ first:{c:'oklch(52% 0.13 152)',s:'oklch(52% 0.13 152 / 0.13)'}, second:{c:'oklch(53% 0.13 248)',s:'oklch(53% 0.13 248 / 0.13)'}, wild:{c:'oklch(60% 0.13 66)',s:'oklch(60% 0.13 66 / 0.15)'}, event:{c:'oklch(55% 0.13 300)',s:'oklch(55% 0.13 300 / 0.13)'} } };
+    const LG = { winDot:'#23211a', lossDot:'#cfc7b3', sWin:'#23211a', sLoss:'#8a8474', tint:false, bar:false,
+      drawNormal:'#4a4536', drawWeak:'#b3aa92', drawX:'#9a3b2e',
+      berth:{ first:{c:'#23211a',s:'transparent'}, second:{c:'#23211a',s:'transparent'}, wild:{c:'#23211a',s:'transparent'}, event:{c:'#23211a',s:'transparent'} } };
+    const BC = { winDot:'oklch(80% 0.19 150)', lossDot:'oklch(46% 0.03 245)', sWin:'oklch(82% 0.19 150)', sLoss:'oklch(74% 0.2 38)', tint:hl, bar:hl,
+      drawNormal:'oklch(72% 0.07 200)', drawWeak:'#3f4a58', drawX:'oklch(74% 0.2 38)',
+      berth:{ first:{c:'oklch(82% 0.18 150)',s:'oklch(82% 0.18 150 / 0.16)'}, second:{c:'oklch(80% 0.13 210)',s:'oklch(80% 0.13 210 / 0.16)'}, wild:{c:'oklch(84% 0.16 88)',s:'oklch(84% 0.16 88 / 0.18)'}, event:{c:'oklch(72% 0.16 310)',s:'oklch(72% 0.16 310 / 0.18)'} } };
+    const BR = { winDot:'#0c0c0a', lossDot:'#f1f1ec', sWin:'#0c0c0a', sLoss:'#0c0c0a', tint:false, bar:false,
+      drawNormal:'#0c0c0a', drawWeak:'#b0b0a9', drawX:'oklch(58% 0.22 28)',
+      berth:{ first:{c:'#0c0c0a',s:'oklch(72% 0.05 150)'}, second:{c:'#0c0c0a',s:'oklch(72% 0.05 245)'}, wild:{c:'#0c0c0a',s:'oklch(78% 0.13 85)'}, event:{c:'#0c0c0a',s:'oklch(64% 0.21 28)'} } };
+
+    const shift = this.shifts[this.state.night];
+    const rows = this.standingsFor(shift);
+    const weeks = this.season.weeks || 18;
+
+    return {
+      loading:false,
+      isSporty: skin==='sporty', isLedger: skin==='ledger', isBroadcast: skin==='broadcast', isBrutal: skin==='brutalist',
+      season: this.season.season, seasonShort: '26–27', meta: weeks+' weeks · final', metaShort: weeks+' WK',
+      nightName: shift, teamCount: rows.length,
+      sporty: this.makeTeams(rows, SP),
+      ledger: this.makeTeams(rows, LG),
+      broadcast: this.makeTeams(rows, BC),
+      brutal: this.makeTeams(rows, BR),
+      tabsSporty: this.makeTabs({ aBg:'oklch(52% 0.13 245)', aFg:'#fff', aBc:'oklch(52% 0.13 245)', iBg:'transparent', iFg:'oklch(53% 0.03 250)', iBc:'oklch(91% 0.016 232)', hBg:'oklch(96.5% 0.013 232)' }),
+      tabsLedger: this.makeTabs({ aBg:'#e6dfcd', aFg:'#23211a', aBc:'transparent', iBg:'transparent', iFg:'#9a927e', iBc:'transparent', hBg:'#ece5d4' }),
+      tabsBroadcast: this.makeTabs({ aBg:'oklch(80% 0.19 150)', aFg:'#0b0e13', aBc:'oklch(80% 0.19 150)', iBg:'transparent', iFg:'#7e8a99', iBc:'#222a36', hBg:'#161c26' }),
+      tabsBrutal: this.makeTabs({ aBg:'#0c0c0a', aFg:'#f1f1ec', aBc:'#0c0c0a', iBg:'transparent', iFg:'#0c0c0a', iBc:'#0c0c0a', hBg:'#e2e2db' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

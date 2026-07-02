@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeflash{0%{opacity:0;transform:translateY(6px)}12%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
+  ::-webkit-scrollbar{height:8px;width:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(120,120,120,.32);border-radius:8px}
+</style>
+</helmet>
+
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:'Archivo',sans-serif;color:oklch(53% 0.03 250);background:oklch(97.5% 0.012 232)">
+  <div style="width:26px;height:26px;border-radius:50%;border:3px solid oklch(88% 0.02 245);border-top-color:oklch(52% 0.13 245);animation:spin .8s linear infinite"></div>
+  <div style="font-size:13px;letter-spacing:.04em">{{ loadingText }}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;background:oklch(97.5% 0.012 232);color:oklch(29% 0.03 250);font-family:'Archivo',sans-serif;padding-bottom:96px">
+
+  <!-- header -->
+  <header style="border-bottom:1px solid oklch(91% 0.016 232);background:#fff">
+    <div style="max-width:760px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+      <div>
+        <div style="font:700 24px 'Saira Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;line-height:1">Enter Results</div>
+        <div style="font-size:12.5px;color:oklch(52% 0.03 250);margin-top:2px">Mansfield Curling League · {{ season }}</div>
+      </div>
+      <div style="font-size:11px;color:oklch(42% 0.09 152);background:oklch(96% 0.04 152);border:1px solid oklch(88% 0.06 152);border-radius:6px;padding:5px 9px;max-width:220px;line-height:1.4">● Live — saves to the shared league database for everyone.</div>
+    </div>
+  </header>
+
+  <main style="max-width:760px;margin:0 auto;padding:20px">
+
+    <!-- STEP 1+2: night & week (native selects for mobile) -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1 1 240px;min-width:0">
+        <label for="shiftSel" style="display:block;font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:oklch(54% 0.03 250);margin-bottom:7px">1 · League night</label>
+        <div style="position:relative">
+          <select id="shiftSel" value="{{ shiftName }}" onChange="{{ onShift }}" style="appearance:none;-webkit-appearance:none;width:100%;min-height:50px;font:600 16px 'Archivo',sans-serif;color:oklch(30% 0.03 250);padding:13px 40px 13px 14px;border:1px solid oklch(88% 0.016 232);border-radius:10px;background:#fff;cursor:pointer">
+            <sc-for list="{{ shiftOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:oklch(55% 0.03 250);font-size:12px">▾</span>
+        </div>
+      </div>
+      <div style="flex:1 1 240px;min-width:0">
+        <label for="weekSel" style="display:block;font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:oklch(54% 0.03 250);margin-bottom:7px">2 · Week</label>
+        <div style="position:relative">
+          <select id="weekSel" value="{{ weekValue }}" onChange="{{ onWeek }}" style="appearance:none;-webkit-appearance:none;width:100%;min-height:50px;font:600 16px 'Archivo',sans-serif;color:oklch(30% 0.03 250);padding:13px 40px 13px 14px;border:1px solid oklch(88% 0.016 232);border-radius:10px;background:#fff;cursor:pointer">
+            <sc-for list="{{ weekOptions }}" as="o" hint-placeholder-count="9"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:oklch(55% 0.03 250);font-size:12px">▾</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- context bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:22px 0 12px">
+      <div style="font:700 20px 'Saira Condensed',sans-serif;letter-spacing:.02em">{{ contextTitle }}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;font-weight:600;color:{{ statusColor }};background:{{ statusBg }};border:1px solid {{ statusBorder }};border-radius:6px;padding:4px 9px">{{ statusText }}</span>
+      </div>
+    </div>
+
+    <!-- STEP 3: games -->
+    <div style="font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:oklch(54% 0.03 250);margin-bottom:9px">3 · Tap the winner of each game</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ games }}" as="g" hint-placeholder-count="6">
+        <div style="background:#fff;border:1px solid oklch(91% 0.016 232);border-radius:11px;padding:11px 12px;display:flex;align-items:center;gap:10px">
+          <div style="width:20px;font:700 13px 'Saira Condensed',sans-serif;color:oklch(64% 0.02 250);text-align:center">{{ g.num }}</div>
+          <button onClick="{{ g.pickA }}" aria-pressed="{{ g.aPressed }}" aria-label="{{ g.aAria }}" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px;min-height:54px;border-radius:8px;border:1.5px solid {{ g.aBorder }};background:{{ g.aBg }};color:{{ g.aFg }};cursor:pointer;font-weight:600;font-size:15px" style-hover="border-color:oklch(66% 0.1 245)">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.a }}</span>
+            <span style="font:700 12px 'Saira Condensed',sans-serif;letter-spacing:.05em;color:{{ g.aTagColor }}">{{ g.aTag }}</span>
+          </button>
+          <div style="font:600 11px 'Saira Condensed',sans-serif;color:oklch(66% 0.02 250);letter-spacing:.08em">VS</div>
+          <button onClick="{{ g.pickB }}" aria-pressed="{{ g.bPressed }}" aria-label="{{ g.bAria }}" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px;min-height:54px;border-radius:8px;border:1.5px solid {{ g.bBorder }};background:{{ g.bBg }};color:{{ g.bFg }};cursor:pointer;font-weight:600;font-size:15px" style-hover="border-color:oklch(66% 0.1 245)">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.b }}</span>
+            <span style="font:700 12px 'Saira Condensed',sans-serif;letter-spacing:.05em;color:{{ g.bTagColor }}">{{ g.bTag }}</span>
+          </button>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- bye -->
+    <sc-if value="{{ hasBye }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:12px;display:flex;align-items:center;gap:9px;font-size:13px;color:oklch(50% 0.03 250)">
+        <span style="font:700 10px 'Saira Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;background:oklch(94% 0.014 250);border:1px solid oklch(89% 0.016 250);border-radius:5px;padding:3px 8px">Bye</span>
+        <span style="font-weight:600;color:oklch(38% 0.03 250)">{{ byeTeam }}</span>
+        <span>sits out this week — no result to enter.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ saveError }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="margin-top:16px;font-size:12.5px;line-height:1.5;color:oklch(45% 0.16 27);background:oklch(97% 0.03 27);border:1px solid oklch(88% 0.07 27);border-radius:9px;padding:11px 13px">{{ saveError }}</div>
+    </sc-if>
+
+    <!-- helper note about correction -->
+    <div style="margin-top:20px;font-size:12px;line-height:1.55;color:oklch(55% 0.03 250);background:#fff;border:1px solid oklch(92% 0.014 232);border-radius:9px;padding:12px 14px">
+      <strong style="color:oklch(38% 0.03 250)">Fixing a mistake?</strong> Just come back to this night and week later — your picks load already filled in. Change what’s wrong and Save again; it overwrites, never duplicates.
+    </div>
+
+  </main>
+
+  <!-- sticky footer -->
+  <div style="position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid oklch(90% 0.016 232);box-shadow:0 -2px 12px rgba(20,30,45,.05)">
+    <div style="max-width:760px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:13px;color:oklch(48% 0.03 250)"><strong style="color:oklch(30% 0.03 250);font-weight:700">{{ progressDone }}</strong> of {{ progressTotal }} entered</div>
+        <sc-if value="{{ dirty }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;font-weight:600;color:oklch(55% 0.14 60)">Unsaved changes</span></sc-if>
+        <span role="status" aria-live="polite"><sc-if value="{{ flash }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:600;color:oklch(48% 0.13 152);animation:fadeflash 2.2s ease forwards">✓ Saved</span></sc-if></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px">
+        <sc-if value="{{ dirty }}" hint-placeholder-val="{{ false }}"><button onClick="{{ revert }}" style="padding:9px 14px;border-radius:8px;border:1px solid oklch(88% 0.02 250);background:#fff;color:oklch(46% 0.03 250);font-weight:600;font-size:13.5px;cursor:pointer" style-hover="background:oklch(96% 0.012 232)">Revert</button></sc-if>
+        <button onClick="{{ submit }}" style="padding:10px 22px;border-radius:8px;border:none;background:{{ submitBg }};color:#fff;font-weight:600;font-size:14px;white-space:nowrap;cursor:{{ submitCursor }};opacity:{{ submitOpacity }}" style-hover="filter:brightness(1.05)">{{ submitLabel }}</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { shift:0, week:null, draft:{}, ready:false, error:null, flash:false, saving:false };
+
+  MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  componentDidMount(){
+    import('./mansfield-data.js')
+      .then(m => { this.dataLib = m; return m.loadSeason(m.DEFAULT_SEASON); })
+      .then(data=>{ this.build(data); const s=this.shifts[0]; const w=this.weeksList[s][0].week; this.setState({ ready:true, week:w, draft:this.draftFor(s,w) }); })
+      .catch(e=>this.setState({ error:String(e) }));
+  }
+
+  fmtDate(iso){
+    if(!iso) return '';
+    const p=String(iso).split('-'); if(p.length<3) return String(iso);
+    return this.MONTHS[(+p[1])-1]+' '+(+p[2]);
+  }
+
+  build(data){
+    this.season = data.season;
+    const SHIFT_ORDER=['Tuesday Dinner','Tuesday Late','Wednesday Dinner','Wednesday Late','Thursday Dinner','Thursday Late'];
+    this.shifts = data.shifts.slice().sort((a,b)=>{ const ia=SHIFT_ORDER.indexOf(a), ib=SHIFT_ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+    this.winners = {};                     // truth from the DB, keyed by game id
+    const teamsByShift={}; data.shifts.forEach(s=>teamsByShift[s]=[]);
+    data.teams.forEach(t=>teamsByShift[t.shift].push(t.name));
+    const sched={}; const weeks={};
+    data.shifts.forEach(s=>{ sched[s]={}; weeks[s]=[]; });
+    for(const g of data.games){
+      const s=g.shift, w=g.week;
+      if(!sched[s][w]){ sched[s][w]={ games:[], playing:new Set(), date:g.date }; }
+      sched[s][w].games.push({ id:g.id, a:g.a, b:g.b, aNo:g.home_no, bNo:g.away_no });
+      sched[s][w].playing.add(g.a); sched[s][w].playing.add(g.b);
+      this.winners[g.id] = g.winner || null;
+    }
+    data.shifts.forEach(s=>{
+      const wk = Object.keys(sched[s]).map(Number).sort((a,b)=>a-b);
+      weeks[s] = wk.map(w=>({ week:w, date:this.fmtDate(sched[s][w].date) }));
+      wk.forEach(w=>{
+        const cell=sched[s][w];
+        const bye = teamsByShift[s].filter(t=>!cell.playing.has(t));
+        cell.bye = bye.length===1 ? bye[0] : (bye.length>1 ? bye.join(', ') : null);
+        cell.dateLabel = this.fmtDate(cell.date);
+      });
+    });
+    this.sched=sched; this.weeksList=weeks; this.teamsByShift=teamsByShift;
+  }
+
+  draftFor(shift, week){
+    const d={}; this.sched[shift][week].games.forEach(g=>{ if(this.winners[g.id]) d[g.id]=this.winners[g.id]; }); return d;
+  }
+  savedMapFor(shift, week){
+    const m={}; this.sched[shift][week].games.forEach(g=>{ if(this.winners[g.id]) m[g.id]=this.winners[g.id]; }); return m;
+  }
+
+  // ---- interactions ----
+  selectShift(i){
+    const s=this.shifts[i]; const w=this.weeksList[s][0].week;
+    this.setState({ shift:i, week:w, draft:this.draftFor(s,w), flash:false, error:null });
+  }
+  selectWeek(w){
+    const s=this.shifts[this.state.shift];
+    this.setState({ week:w, draft:this.draftFor(s,w), flash:false, error:null });
+  }
+  onShift(e){ const i=this.shifts.indexOf(e.target.value); if(i>=0) this.selectShift(i); }
+  onWeek(e){ this.selectWeek(Number(e.target.value)); }
+  pick(gid, winner){
+    if(this.state.saving) return;
+    const d={...this.state.draft};
+    if(d[gid]===winner) delete d[gid]; else d[gid]=winner;
+    this.setState({ draft:d, flash:false });
+  }
+  async submit(){
+    const shift=this.shifts[this.state.shift], week=this.state.week;
+    const cell=this.sched[shift][week], draft=this.state.draft;
+    const changes=[];
+    for(const g of cell.games){
+      const cur=this.winners[g.id]||null, next=draft[g.id]||null;
+      if(cur!==next){ const no = next==null ? null : (next===g.a ? g.aNo : g.bNo); changes.push({ id:g.id, no, name:next }); }
+    }
+    if(!changes.length){ this.setState({ flash:true }); return; }
+    this.setState({ saving:true, error:null });
+    try{
+      await Promise.all(changes.map(c=> this.dataLib.setWinner(c.id, c.no)));
+      changes.forEach(c=>{ this.winners[c.id]=c.name; });
+      this.setState({ saving:false, flash:true });
+    }catch(e){ this.setState({ saving:false, error:'Save failed — '+String(e) }); }
+  }
+  revert(){
+    const s=this.shifts[this.state.shift], w=this.state.week;
+    this.setState({ draft:this.draftFor(s,w), flash:false, error:null });
+  }
+
+  weekStatus(s, w){
+    const cell=this.sched[s][w]; if(!cell) return 'none';
+    const total=cell.games.length;
+    const done=cell.games.filter(g=>this.winners[g.id]).length;
+    return done>=total ? 'full' : (done>0 ? 'partial' : 'none');
+  }
+
+  renderVals(){
+    if(!this.state.ready){
+      return { loading:true, ready:false, loadingText: this.state.error ? ('Could not load data — '+this.state.error) : 'Loading schedule…' };
+    }
+    const ACC='oklch(52% 0.13 245)';
+    const shift=this.shifts[this.state.shift];
+    const week=this.state.week;
+    const cell=this.sched[shift][week];
+    const draft=this.state.draft;
+    const saved=this.savedMapFor(shift, week);
+
+    const shiftOptions=this.shifts.map(s=>({ value:s, label:s }));
+    const weekOptions=this.weeksList[shift].map(wi=>{ const st=this.weekStatus(shift,wi.week); const mark= st==='full'?'  ✓':(st==='partial'?'  •':''); return { value:String(wi.week), label:'Week '+wi.week+' · '+wi.date+mark }; });
+
+    const games=cell.games.map((g,i)=>{
+      const pick=draft[g.id]; const aWin=pick===g.a, bWin=pick===g.b;
+      const winStyle={ border:ACC, bg:'oklch(96% 0.04 245)', fg:'oklch(30% 0.09 250)' };
+      const loseStyle={ border:'oklch(90% 0.016 232)', bg:'#fff', fg:'oklch(60% 0.03 250)' };
+      const idle={ border:'oklch(90% 0.016 232)', bg:'#fff', fg:'oklch(32% 0.03 250)' };
+      const aS = pick? (aWin?winStyle:loseStyle) : idle;
+      const bS = pick? (bWin?winStyle:loseStyle) : idle;
+      return { num:i+1, a:g.a, b:g.b,
+        pickA:()=>this.pick(g.id,g.a), pickB:()=>this.pick(g.id,g.b),
+        aBorder:aS.border, aBg:aS.bg, aFg:aS.fg, bBorder:bS.border, bBg:bS.bg, bFg:bS.fg,
+        aTag:aWin?'WON':(pick?'LOSS':''), bTag:bWin?'WON':(pick?'LOSS':''),
+        aTagColor:aWin?ACC:'oklch(66% 0.03 250)', bTagColor:bWin?ACC:'oklch(66% 0.03 250)',
+        aPressed:aWin?'true':'false', bPressed:bWin?'true':'false',
+        aAria:aWin?(g.a+' — winner, tap to clear'):(g.a+' — tap to mark winner'),
+        bAria:bWin?(g.b+' — winner, tap to clear'):(g.b+' — tap to mark winner') };
+    });
+
+    const total=cell.games.length; const done=Object.keys(draft).length;
+    const dirty = JSON.stringify(draft)!==JSON.stringify(saved);
+    const savedExists = Object.keys(saved).length>0;
+    let statusText, sc, sbg, sbd;
+    if(this.state.saving){ statusText='Saving…'; sc='oklch(45% 0.09 250)'; sbg='oklch(96% 0.03 250)'; sbd='oklch(88% 0.04 250)'; }
+    else if(this.state.error){ statusText='Save failed'; sc='oklch(50% 0.18 27)'; sbg='oklch(96% 0.05 27)'; sbd='oklch(86% 0.08 27)'; }
+    else if(savedExists && !dirty && done>=total){ statusText='Submitted ✓'; sc='oklch(40% 0.13 152)'; sbg='oklch(95% 0.05 152)'; sbd='oklch(85% 0.06 152)'; }
+    else if(savedExists && !dirty){ statusText='Saved (partial)'; sc='oklch(48% 0.1 70)'; sbg='oklch(96% 0.05 80)'; sbd='oklch(88% 0.06 80)'; }
+    else if(dirty){ statusText='Not saved yet'; sc='oklch(50% 0.03 250)'; sbg='oklch(96% 0.013 250)'; sbd='oklch(90% 0.016 250)'; }
+    else { statusText='Not entered'; sc='oklch(55% 0.03 250)'; sbg='oklch(96% 0.013 250)'; sbd='oklch(90% 0.016 250)'; }
+
+    const canSubmit = dirty && !this.state.saving;
+    return {
+      loading:false, ready:true, season:this.season,
+      shiftName: shift, weekValue: String(week),
+      onShift:(e)=>this.onShift(e), onWeek:(e)=>this.onWeek(e),
+      shiftOptions, weekOptions,
+      contextTitle: shift+' · '+cell.dateLabel,
+      statusText, statusColor:sc, statusBg:sbg, statusBorder:sbd,
+      games,
+      hasBye: !!cell.bye, byeTeam: cell.bye || '',
+      progressDone:done, progressTotal:total,
+      dirty, flash:this.state.flash, saveError:this.state.error||'',
+      submit:()=>this.submit(), revert:()=>this.revert(),
+      submitLabel: this.state.saving?'Saving…':'Save night',
+      submitBg: canSubmit?ACC:'oklch(80% 0.02 250)', submitCursor:canSubmit?'pointer':'default', submitOpacity:canSubmit?'1':'.7',
+    };
+  }
+}
+</script>
+</body>
+</html>
