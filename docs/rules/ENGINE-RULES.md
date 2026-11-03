@@ -1,9 +1,10 @@
 # Rules the standings engine implements
 
-Source: `2026-27/MCC_League_Guidelines.pdf` (Madison Curling Club Event Rules and
-Event Tiebreakers, effective Oct 31, 2022; "Determination of Mansfield Event
-Playoff Participants – 2022-23"). Section names below refer to that document.
-Everything here is about the **Mansfield** event only.
+Source: **pages 5-7** of `2026-27/MCC_League_Guidelines.pdf` ("Determination of
+Mansfield Event Playoff Participants", dated 2022-23). These are the only pages
+that apply to the Mansfield event. Pages 1-4 (general event rules and the
+tiebreakers for other events) are kept for reference but are not used by the
+engine. The league confirmed these rules are current for 2025-26 and 2026-27.
 
 ## 1. The "one full game" rule
 
@@ -81,23 +82,54 @@ existing `CONFIG` already matches the spot counts above.
 - One stone per team per season, measured to the nearest 1/2 inch from the button.
 - Missing the house is recorded as 72".
 - A team that has not thrown by the deadline is marked **X**, which ranks *below* 72".
-- Deadline for Mansfield playoff purposes: the completion of the final game of the first half for the team's shift. (The general-event page says week 8; that page excludes Mansfield.)
+- Deadline: the completion of the final game of the first half for the team's shift.
 - Stored as text: a number, `X`, or null (not yet recorded). Null and X rank the same.
 
-## 6. Games, forfeits and unplayed games
+## 6. Decided scope
 
-- The posted event sheet is the official record. Winning thirds mark the result.
-- A game nobody marks by the end of the last week is a **forfeit for both teams** (Rule 7). The current data model (one winner or none) cannot represent this.
-- A team that requests a reschedule and cannot agree a date with the other skip records a loss (Rule 11B).
-- A team that is not legal at start time can forfeit after 30 minutes (Rule 5); games with a non-member are forfeited (Rule 8).
-- Rescheduled games can be played on a different date than scheduled (Rule 11A). Played date can differ from scheduled date.
-- No tiebreaker games are ever played.
-- For the Mansfield event, unplayed games are *not* counted as losses mid-season; the one-full-game rule exists precisely because game counts differ.
+- **Forfeits are not modelled.** Decided by the site owner: any team in contention marks all of its games, so every game ends with exactly one winner. To be raised with the league chairs at the end of 2026-27.
+- Unplayed games are *not* counted as losses; the one-full-game rule exists because game counts differ.
+- No tiebreaker games are played.
 
-## 7. Open questions (need a human answer)
+## 7. Checked against the current engine (Nov 2026)
 
-1. **Are the 2022-23 playoff spot counts and the draw-shot deadline still the rules for 2026-27?** The document is dated 2022.
-2. **Where does the first half end this season?** The old site hardcoded week 9 of 18. This season Tuesday has 20 weeks. The break week comes from the schedule, not a default.
-3. **Do we need to record forfeits?** In particular, a double forfeit for an unmarked game. If yes, the games table needs a result type beyond "winner or null".
-4. **Is a team ever "clinched" or "eliminated" before the halves end?** The rules only describe determination at the end of each half; the site should label in-progress badges as "currently leading", not as qualified.
-5. **Event wild card fairness across shifts**: the rules assume equal games played, plus or minus one. Special circumstances (weather) are handled by the Games Committee, which the site cannot know about.
+`tests/engine-rules.test.js` runs the engine against this document: the 9-0 / 8-0 / 8-1
+worked example (both branches), the "tied within half a game" rule, "12-6 does not
+beat 11-6", criteria order for half winners / shift wild cards / event wild cards
+(including no head-to-head for event wild cards), draw-shot ranking (X and blank
+rank below 72"), "one tie is not all tie", and the 28 playoff spots. **All pass.**
+The tiebreaker logic itself is correct.
+
+The new engine in `src/engine.js` (with `tests/engine.test.js`) implements section 8 and
+fixes gaps 1-4 below. The old engine inside `index.html` and its tests
+(`tests/legacy-engine-rules.test.cjs`) stay only until the site is cut over.
+
+Gaps the document does not settle, found while testing the old engine:
+
+1. **Berths are shown before they are decided** (decided: see section 8, item 1). The engine awards every berth from day one, using the first-listed team when everyone is tied. After one game it already shows a second-half berth for a team that lost its only game. The rules only decide berths at the end of each half.
+2. **Coin flips are hidden.** When criteria run out the engine silently picks the first team instead of saying a coin flip is needed.
+3. **Wednesday Late boundary games.** With a different break week per team, a game in the boundary week counts in the first half for one team and the second half for the other, so the half head-to-head is lopsided (the winner shows 1-0, the loser 0-0 instead of 0-1). This can change who wins a half head-to-head when that game is the only meeting.
+4. **Display order is by win percentage**, which can disagree with the games-behind logic used for berths. Cosmetic.
+
+## 8. Decisions (site owner, Nov 2 2026)
+
+1. **A half is complete when all of its games are played.** Per team: a team's half
+   is the games on its own side of its own line (see 3). A berth's *status* is then:
+   - **projected**: the half is not complete (or, for wild cards, the regular season is not complete). Show as "currently leading", never as qualified.
+   - **provisional**: the half is complete, but the decision used a season-long criterion (overall record or season head-to-head) and at least one team in the contention at that step still has season games left. Tiebreaker 1 is overall record, so a half can be complete while its winner is not settled.
+   - **final**: every input is final. A team that is at least one full game ahead of every other team on the half record **wins the half outright**: it is final as soon as the half is complete, with no need to wait for season results.
+   - **clinched early** (before the half is complete): same test applied to the worst case. A team has clinched if, even if it lost all of its remaining half games and every rival won all of theirs, it would still be at least one full game ahead of each rival on the half record. Deliberately conservative.
+   - **needs coin flip**: all criteria are exhausted. Say so; never pick a team.
+   Draw shots are final once the shift's first half is complete (a blank is then X by rule).
+2. **A team can hold only one berth.** Berths are awarded in the order on page 5: first-half winners, first-half runners-up, second-half winners, second-half runners-up, shift wild cards, event wild cards. The engine already does this.
+3. **Wednesday Late uses per-team half boundaries in 2026-27**, confirmed by the sheet (`docs/schedules/2026-27/wednesday-late.md`): teams 4-10 end the first half at week 11, everyone else at week 10. Other shifts: from their sheets. See section 9 for head-to-head.
+
+## 9. Head-to-head and boundary-week games (decided)
+
+- **Half head-to-head** counts a game only if it falls in that half for **both** teams. Week 11 (1/20) on Wednesday Late is first half for teams 4-10 but second half for the other ten teams, so between those groups it does not count toward either half's head-to-head.
+- **Season head-to-head** always counts every game.
+
+## 10. Open
+
+1. The first-half end week for the other five shifts (from their record sheets and pairings).
+2. The page 7 draw principles (top four seeds by event-wild-card criteria get byes; teams from one shift kept apart in rounds 1-2) describe the playoff bracket, which this site does not yet build. The posted schedule says "Mansfield Playdowns Week March 29 - April 3".
