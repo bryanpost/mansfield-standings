@@ -34,6 +34,8 @@ create table if not exists public.games (
   shift      text not null,
   week       int  not null,
   game_date  date,
+  draw_time  text,                              -- '6:35' / '8:45' (display only)
+  sheet      int,                               -- sheet number (display only)
   home_no    int  not null,
   away_no    int  not null,
   winner_no  int,                               -- null = not entered yet

@@ -1,11 +1,23 @@
-# Wednesday Late, 2026-27: record sheet transcription
+# Wednesday Late, 2026-27
 
-Source: `wednesday-late-record-sheet.jpg` (photo of the posted sheet, taken Nov 2, 2026).
-Transcribed by Claude from the photo; the checks at the bottom passed, but a human
-should still confirm the stepped half line (rows 4-10) and the week-1 marks.
+## Files
 
-**This sheet has no opponents.** It shows dates, byes, half boundaries and W/L marks
-per team, but not who plays whom. The pairings come from a different document and are still needed.
+| File | What it is |
+|---|---|
+| `wednesday-late-record-sheet.jpg` | Photo of the posted record sheet (dates, byes, half lines, W/L marks; no opponents). |
+| `wednesday-night-schedule.png` | The pairings: who plays whom, 6:35 and 8:45 draws, sheets, byes, clean-up. |
+| `wednesday-night-teams-roster.png` | Team roster from the club website (skip, vice, second, lead and ratings). |
+| `../../../data/2026-27/wednesday-late/` | The same schedule as data: `teams.csv`, `weeks.csv`, `games.csv`. |
+| `../../../db/seed/2026-27/wednesday-late.sql` | Generated seed SQL for Supabase. |
+
+Facts from the posted schedule: 17 teams share the 6:35 and 8:45 draws (the
+league's "Wednesday 6:30/8:30" shift); holiday break 12/23 and 12/30; "Mansfield
+Playdowns Week March 29 - April 3". Pairings are written like "4v6" with the lower
+team number first, so the posted schedule has no home/away. The seed stores the lower
+number as `home_no`. The record sheet and the pairings were transcribed separately
+and agree on every bye and every game count.
+
+## Weeks
 
 ## Weeks
 
@@ -46,13 +58,15 @@ first half ends at week 10.
 ## Week 1 (10/28) marks already on the sheet
 
 Bye: Kozloski.
-W: Oldenburg, Oakeson, McPhee, Ryan, K Neidhart, Perry (Perry's mark is smudged).
-L: Christen, Shilling, Peterson, Ebert (faint), Veler, J Neidhart.
-Blank: Krajewski, Hamilton, Ramm, Koehler (must be 2 W + 2 L).
+W: Oldenburg, Oakeson, McPhee, Ryan, K Neidhart, Perry. L: Christen, Shilling, Peterson, Ebert, Veler, J Neidhart.
+(Perry W and Ebert L confirmed by the site owner.)
+Blank: Krajewski, Hamilton, Ramm, Koehler. With the pairings these are the games 5v12 and 10v13, not yet marked.
+Results entered in the seed: 4v6 -> 4, 3v17 -> 3, 2v11 -> 2, 14v15 -> 15, 8v16 -> 16, 7v9 -> 9.
 
 ## Checks that passed
 
 - 20 weeks, 17 teams, exactly one bye every week (20 byes).
 - 160 games total, 8 per week (320 team-games = 3 x 18 + 14 x 19).
 - Every team plays exactly 9 second-half games under this boundary reading.
-- Week 1: 6 W + 6 L marked, 4 blank = 2 W + 2 L, consistent with 8 games.
+- Week 1: every marked W is paired with a marked L; the 2 unmarked games are 5v12 and 10v13.
+- `py scripts/verify_schedule.py data/2026-27/wednesday-late` passes (every team plays once a week except its bye).

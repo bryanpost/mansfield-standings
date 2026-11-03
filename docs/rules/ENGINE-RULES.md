@@ -113,14 +113,19 @@ Gaps the document does not settle, found while testing:
    is the games on its own side of its own line (see 3). A berth's *status* is then:
    - **projected**: the half is not complete (or, for wild cards, the regular season is not complete). Show as "currently leading", never as qualified.
    - **provisional**: the half is complete, but the decision used a season-long criterion (overall record or season head-to-head) and at least one team in the contention at that step still has season games left. Tiebreaker 1 is overall record, so a half can be complete while its winner is not settled.
-   - **final**: every input is final. A winner who is a full game clear on the half record alone is final as soon as the half is complete.
+   - **final**: every input is final. A team that is at least one full game ahead of every other team on the half record **wins the half outright**: it is final as soon as the half is complete, with no need to wait for season results.
+   - **clinched early** (before the half is complete): same test applied to the worst case. A team has clinched if, even if it lost all of its remaining half games and every rival won all of theirs, it would still be at least one full game ahead of each rival on the half record. Deliberately conservative.
    - **needs coin flip**: all criteria are exhausted. Say so; never pick a team.
    Draw shots are final once the shift's first half is complete (a blank is then X by rule).
 2. **A team can hold only one berth.** Berths are awarded in the order on page 5: first-half winners, first-half runners-up, second-half winners, second-half runners-up, shift wild cards, event wild cards. The engine already does this.
-3. **Wednesday Late uses per-team half boundaries in 2026-27**, confirmed by the sheet (`docs/schedules/2026-27/wednesday-late.md`): teams 4-10 end the first half at week 11, everyone else at week 10. Other shifts: from their sheets.
+3. **Wednesday Late uses per-team half boundaries in 2026-27**, confirmed by the sheet (`docs/schedules/2026-27/wednesday-late.md`): teams 4-10 end the first half at week 11, everyone else at week 10. Other shifts: from their sheets. See section 9 for head-to-head.
 
-## 9. Open
+## 9. Head-to-head and boundary-week games (decided)
 
-1. **Head-to-head for a boundary-week game.** Week 11 (1/20) is first half for teams 4-10 and second half for the others, so a game between, say, team 4 and team 12 is in different halves for each. Proposed default: a game counts toward the *half* head-to-head only if it is in the same half for both teams; it always counts toward the *season* head-to-head (criterion 3). Confirm, or ask the league chairs.
-2. The first-half end week for the other five shifts (from their sheets).
-3. The page 7 draw principles (top four seeds by event-wild-card criteria get byes; teams from one shift kept apart in rounds 1-2) describe the playoff bracket, which this site does not yet build.
+- **Half head-to-head** counts a game only if it falls in that half for **both** teams. Week 11 (1/20) on Wednesday Late is first half for teams 4-10 but second half for the other ten teams, so between those groups it does not count toward either half's head-to-head.
+- **Season head-to-head** always counts every game.
+
+## 10. Open
+
+1. The first-half end week for the other five shifts (from their record sheets and pairings).
+2. The page 7 draw principles (top four seeds by event-wild-card criteria get byes; teams from one shift kept apart in rounds 1-2) describe the playoff bracket, which this site does not yet build. The posted schedule says "Mansfield Playdowns Week March 29 - April 3".
