@@ -9,7 +9,7 @@ engine and these documents disagree, the documents win and the engine is the bug
 |---|---|
 | `2026-27/MCC_League_Guidelines.pdf` | Original document as received. Never edited. |
 | `2026-27/MCC_League_Guidelines.txt` | Verbatim text extraction of the PDF, so it can be searched and diffed. |
-| `ENGINE-RULES.md` | The parts of the rules the engine implements, as precise steps. The unit tests are written against this file. |
+| `ENGINE-RULES.md` | Pages 5-7 as precise steps, what the engine was checked against, known gaps and open questions. `tests/engine-rules.test.js` is written against this file. |
 | `archive/` | Superseded versions, moved here (not deleted) when rules change. |
 
 ## When the rules change
@@ -18,9 +18,9 @@ engine and these documents disagree, the documents win and the engine is the bug
 2. Add the new PDF and its text extraction.
 3. Update `ENGINE-RULES.md` and the tests in the same commit.
 
-## Provenance warning
+## Which pages matter
 
-The PDF says "Effective October 31, 2022", and its playoff-participants page is
-headed "2022-23". It was supplied as the current guidelines for 2026-27, but
-nothing in the document itself confirms the playoff spot counts or the draw-shot
-deadline for this season. See "Open questions" in `ENGINE-RULES.md`.
+Only **pages 5-7** apply to the Mansfield event. Pages 1-4 cover other club
+events. The rules are from 2022 and have been confirmed by the site owner as
+current for 2025-26 and 2026-27. Nothing in the document itself says so, so
+re-confirm each season.
