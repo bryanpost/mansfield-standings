@@ -102,15 +102,25 @@ The tiebreaker logic itself is correct.
 
 Gaps the document does not settle, found while testing:
 
-1. **Berths are shown before they are decided.** The engine awards every berth from day one, using the first-listed team when everyone is tied. After one game it already shows a second-half berth for a team that lost its only game. The rules only decide berths at the end of each half.
+1. **Berths are shown before they are decided** (decided: see section 8, item 1). The engine awards every berth from day one, using the first-listed team when everyone is tied. After one game it already shows a second-half berth for a team that lost its only game. The rules only decide berths at the end of each half.
 2. **Coin flips are hidden.** When criteria run out the engine silently picks the first team instead of saying a coin flip is needed.
 3. **Wednesday Late boundary games.** With a different break week per team, a game in the boundary week counts in the first half for one team and the second half for the other, so the half head-to-head is lopsided (the winner shows 1-0, the loser 0-0 instead of 0-1). This can change who wins a half head-to-head when that game is the only meeting.
 4. **Display order is by win percentage**, which can disagree with the games-behind logic used for berths. Cosmetic.
 
-## 8. Open questions
+## 8. Decisions (site owner, Nov 2 2026)
 
-1. When is a half "complete" (so its berths are shown as decided rather than projected)? Proposal: the last scheduled date of the half has passed and every game scheduled in it has a recorded winner.
-2. Can a team take two berths, e.g. win both halves? The document implies not (28 distinct teams); the engine assumes the second berth passes to the next team. Confirm.
-3. Does Wednesday Late still use per-team half breaks in 2026-27? If so, which half does a boundary-week game belong to for head-to-head?
-4. Where does the first half end for each shift this season? (From the schedule, not a default.)
-5. The page 7 draw principles (top four seeds by event-wild-card criteria get byes; teams from one shift kept apart in rounds 1-2) describe the playoff bracket, which this site does not yet build.
+1. **A half is complete when all of its games are played.** Per team: a team's half
+   is the games on its own side of its own line (see 3). A berth's *status* is then:
+   - **projected**: the half is not complete (or, for wild cards, the regular season is not complete). Show as "currently leading", never as qualified.
+   - **provisional**: the half is complete, but the decision used a season-long criterion (overall record or season head-to-head) and at least one team in the contention at that step still has season games left. Tiebreaker 1 is overall record, so a half can be complete while its winner is not settled.
+   - **final**: every input is final. A winner who is a full game clear on the half record alone is final as soon as the half is complete.
+   - **needs coin flip**: all criteria are exhausted. Say so; never pick a team.
+   Draw shots are final once the shift's first half is complete (a blank is then X by rule).
+2. **A team can hold only one berth.** Berths are awarded in the order on page 5: first-half winners, first-half runners-up, second-half winners, second-half runners-up, shift wild cards, event wild cards. The engine already does this.
+3. **Wednesday Late uses per-team half boundaries in 2026-27**, confirmed by the sheet (`docs/schedules/2026-27/wednesday-late.md`): teams 4-10 end the first half at week 11, everyone else at week 10. Other shifts: from their sheets.
+
+## 9. Open
+
+1. **Head-to-head for a boundary-week game.** Week 11 (1/20) is first half for teams 4-10 and second half for the others, so a game between, say, team 4 and team 12 is in different halves for each. Proposed default: a game counts toward the *half* head-to-head only if it is in the same half for both teams; it always counts toward the *season* head-to-head (criterion 3). Confirm, or ask the league chairs.
+2. The first-half end week for the other five shifts (from their sheets).
+3. The page 7 draw principles (top four seeds by event-wild-card criteria get byes; teams from one shift kept apart in rounds 1-2) describe the playoff bracket, which this site does not yet build.
