@@ -24,14 +24,14 @@ on conflict (season, shift, team_no) do update set
   name = excluded.name, first_half_end_week = excluded.first_half_end_week;
 
 insert into public.games (season, shift, week, game_date, draw_time, sheet, home_no, away_no, winner_no) values
-  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '6:35', 1, 4, 6, 4),
-  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '6:35', 2, 3, 17, 3),
-  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 1, 2, 11, 2),
-  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 2, 14, 15, 15),
+  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '6:35', 1, 4, 6, null),
+  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '6:35', 2, 3, 17, null),
+  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 1, 2, 11, null),
+  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 2, 14, 15, null),
   ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 3, 5, 12, null),
   ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 4, 10, 13, null),
-  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 5, 8, 16, 16),
-  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 6, 7, 9, 9),
+  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 5, 8, 16, null),
+  ('2026-27', 'Wednesday Late', 1, '2026-10-28', '8:45', 6, 7, 9, null),
   ('2026-27', 'Wednesday Late', 2, '2026-11-04', '6:35', 1, 9, 13, null),
   ('2026-27', 'Wednesday Late', 2, '2026-11-04', '6:35', 2, 8, 12, null),
   ('2026-27', 'Wednesday Late', 2, '2026-11-04', '6:35', 3, 10, 14, null),

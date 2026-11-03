@@ -59,7 +59,8 @@ Bye: Kozloski.
 W: Oldenburg, Oakeson, McPhee, Ryan, K Neidhart, Perry. L: Christen, Shilling, Peterson, Ebert, Veler, J Neidhart.
 (Perry W and Ebert L confirmed by the site owner.)
 Blank: Krajewski, Hamilton, Ramm, Koehler. With the pairings these are the games 5v12 and 10v13, not yet marked.
-Results entered in the seed: 4v6 -> 4, 3v17 -> 3, 2v11 -> 2, 14v15 -> 15, 8v16 -> 16, 7v9 -> 9.
+The seed contains **no results**: week 1 is to be entered through the site as the first real test of the entry page.
+Marks on the sheet, as games: 4v6 -> 4, 3v17 -> 3, 2v11 -> 2, 14v15 -> 15, 8v16 -> 16, 7v9 -> 9; 5v12 and 10v13 not yet marked.
 
 ## Checks that passed
 
