@@ -100,7 +100,11 @@ beat 11-6", criteria order for half winners / shift wild cards / event wild card
 rank below 72"), "one tie is not all tie", and the 28 playoff spots. **All pass.**
 The tiebreaker logic itself is correct.
 
-Gaps the document does not settle, found while testing:
+The new engine in `src/engine.js` (with `tests/engine.test.js`) implements section 8 and
+fixes gaps 1-4 below. The old engine inside `index.html` and its tests
+(`tests/legacy-engine-rules.test.cjs`) stay only until the site is cut over.
+
+Gaps the document does not settle, found while testing the old engine:
 
 1. **Berths are shown before they are decided** (decided: see section 8, item 1). The engine awards every berth from day one, using the first-listed team when everyone is tied. After one game it already shows a second-half berth for a team that lost its only game. The rules only decide berths at the end of each half.
 2. **Coin flips are hidden.** When criteria run out the engine silently picks the first team instead of saying a coin flip is needed.

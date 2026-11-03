@@ -1,0 +1,9 @@
+{
+  "name": "mansfield-standings",
+  "private": true,
+  "type": "module",
+  "description": "Mansfield curling league standings site (static, no build step)",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}

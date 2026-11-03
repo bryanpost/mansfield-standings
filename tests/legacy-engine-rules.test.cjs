@@ -1,7 +1,7 @@
 // Rule-conformance tests for the Mansfield standings engine.
 // Source of truth: docs/rules/ENGINE-RULES.md (pages 5-7 of the MCC guidelines).
-// Run: node tests/engine-rules.test.js
-const { Component } = require('./load-engine.js');
+// Run: node tests/legacy-engine-rules.test.cjs
+const { Component } = require('./legacy-load-engine.cjs');
 const assert = require('assert');
 let pass = 0, fail = 0;
 const t = (name, fn) => { try { fn(); pass++; console.log('PASS', name); } catch (e) { fail++; console.log('FAIL', name, '\n     ', e.message.split('\n')[0]); } };
