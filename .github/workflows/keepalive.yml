@@ -1,22 +1,64 @@
 name: Supabase keep-alive
 
-# Free Supabase projects pause after ~7 days with no activity.
-# This pings the REST API once a day so the database never sleeps.
-# The publishable key is safe to commit — Row Level Security governs access.
+# Two jobs keep this site alive through months with no development:
+#
+# 1. ping       - hits the Supabase REST API daily so the free project never
+#                 pauses (it pauses after ~7 days without activity).
+# 2. stay-awake - GitHub disables scheduled workflows after 60 days with no
+#                 repo activity. This job (a) re-enables this workflow through
+#                 the API on every run and (b) makes one tiny heartbeat commit
+#                 if the last commit on main is more than 30 days old, so the
+#                 60-day clock never gets close to running out.
+#
+# If the ping ever fails you get GitHub's failed-run email. A *disabled*
+# workflow sends nothing, which is why job 2 exists.
 
 on:
   schedule:
-    - cron: "17 6 * * *"   # every day at 06:17 UTC
-  workflow_dispatch:         # lets you run it manually from the Actions tab
+    - cron: "17 6 * * *"   # daily, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write   # heartbeat commit
+  actions: write    # re-enable this workflow
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST
+      - name: Ping Supabase REST (3 tries)
         run: |
-          code=$(curl -sS -o /dev/null -w "%{http_code}" \
-            "https://oufdqsxesayexbohwfhx.supabase.co/rest/v1/teams?select=team_no&limit=1" \
-            -H "apikey: sb_publishable_zOqo3l_CaWlYqyCB4wISwQ_S0hI-oUp")
-          echo "Supabase responded: $code"
-          test "$code" = "200"
+          url="https://oufdqsxesayexbohwfhx.supabase.co/rest/v1/teams?select=team_no&limit=1"
+          key="sb_publishable_zOqo3l_CaWlYqyCB4wISwQ_S0hI-oUp"
+          for i in 1 2 3; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" "$url" -H "apikey: $key" || echo 000)
+            echo "Attempt $i: Supabase responded $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 20
+          done
+          echo "::error::Supabase did not return 200 - project may be paused"
+          exit 1
+
+  stay-awake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Keep this workflow enabled
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow enable keepalive.yml --repo "$GITHUB_REPOSITORY" || true
+      - name: Heartbeat commit if main is stale (>30 days)
+        run: |
+          last=$(git log -1 --format=%ct)
+          age_days=$(( ( $(date +%s) - last ) / 86400 ))
+          echo "Last commit is $age_days days old"
+          if [ "$age_days" -gt 30 ]; then
+            date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/keepalive-heartbeat
+            git config user.name "keepalive-bot"
+            git config user.email "keepalive-bot@users.noreply.github.com"
+            git add .github/keepalive-heartbeat
+            git commit -m "chore: keep-alive heartbeat (repo idle $age_days days)"
+            git push
+          fi
