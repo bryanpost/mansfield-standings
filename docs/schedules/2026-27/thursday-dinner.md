@@ -8,10 +8,9 @@ addresses and the individuals/subs list were left out on purpose.
 
 | File | What it is |
 |---|---|
+| `thursday-dinner-schedule.png` | Screenshot of the schedule table on the club website page (no contact details). |
 | `../../../data/2026-27/thursday-dinner/` | The schedule as data: `teams.csv`, `weeks.csv`, `games.csv`. |
 | `../../../db/seed/2026-27/thursday-dinner.sql` | Generated seed SQL for Supabase (no results). |
-
-No screenshot of the page is saved yet.
 
 Men's league, 4 players per team, point limit 43, shift captain Rob Wixson (team 4).
 13 teams, 6 sheets, one 4:25 draw, 6 games a week plus one bye, 19 league weeks (10/22 to 3/25),
