@@ -4,7 +4,7 @@
 
 const SUPABASE_URL = 'https://oufdqsxesayexbohwfhx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zOqo3l_CaWlYqyCB4wISwQ_S0hI-oUp';
-export const DEFAULT_SEASON = '2025-26';
+export const DEFAULT_SEASON = '2026-27';
 
 const HEADERS = {
   apikey: SUPABASE_KEY,
