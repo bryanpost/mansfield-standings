@@ -8,6 +8,7 @@ addresses and the individuals/subs list were left out on purpose.
 
 | File | What it is |
 |---|---|
+| `tuesday-late-schedule.png` | Screenshot of the schedule table on the club website page (cropped, no contact details). |
 | `../../../data/2026-27/tuesday-late/` | The schedule as data: `teams.csv`, `weeks.csv`, `games.csv`. |
 | `../../../db/seed/2026-27/tuesday-late.sql` | Generated seed SQL for Supabase (no results). |
 
