@@ -97,7 +97,7 @@
 
     <!-- helper note about correction -->
     <div style="margin-top:20px;font-size:12px;line-height:1.55;color:oklch(55% 0.03 250);background:#fff;border:1px solid oklch(92% 0.014 232);border-radius:9px;padding:12px 14px">
-      <strong style="color:oklch(38% 0.03 250)">Fixing a mistake?</strong> (Prototype — saves to the same database as the <a href="../games/">matchup page</a>.) Just come back to this night and week later — your picks load already filled in. Change what's wrong and hit Save again; it overwrites, never duplicates.
+      <strong style="color:oklch(38% 0.03 250)">Fixing a mistake?</strong> (Prototype, saves to the same database as the <a href="../games/">matchup page</a>.) Just come back to this night and week later — your picks load already filled in. Change what's wrong and hit Save again; it overwrites, never duplicates.
     </div>
 
   </main>
@@ -256,42 +256,6 @@ class Component extends DCLogic {
         wPressed:won?'true':'false', lPressed:lost?'true':'false',
         wAria:name+(won?' — won, tap to clear':' — mark won'), lAria:name+(lost?' — lost, tap to clear':' — mark lost'),
         wBorder:w.border, wBg:w.bg, wFg:w.fg, lBorder:l.border, lBg:l.bg, lFg:l.fg };
-    });
-
-    const total=cell.games.length;
-    const done=cell.games.filter(g=>this.winners[g.id]).length;
-    return done>=total ? 'full' : (done>0 ? 'partial' : 'none');
-  }
-
-  renderVals(){
-    if(!this.state.ready){
-      return { loading:true, ready:false, loadingText: this.state.error ? ('Could not load data — '+this.state.error) : 'Loading schedule…' };
-    }
-    const ACC='oklch(52% 0.13 245)';
-    const shift=this.shifts[this.state.shift];
-    const week=this.state.week;
-    const cell=this.sched[shift][week];
-    const draft=this.state.draft;
-    const saved=this.savedMapFor(shift, week);
-
-    const shiftOptions=this.shifts.map(s=>({ value:s, label:s }));
-    const weekOptions=this.weeksList[shift].map(wi=>{ const st=this.weekStatus(shift,wi.week); const mark= st==='full'?'  ✓':(st==='partial'?'  •':''); return { value:String(wi.week), label:'Week '+wi.week+' · '+wi.date+mark }; });
-
-    const games=cell.games.map((g,i)=>{
-      const pick=draft[g.id]; const aWin=pick===g.a, bWin=pick===g.b;
-      const winStyle={ border:ACC, bg:'oklch(96% 0.04 245)', fg:'oklch(30% 0.09 250)' };
-      const loseStyle={ border:'oklch(90% 0.016 232)', bg:'#fff', fg:'oklch(60% 0.03 250)' };
-      const idle={ border:'oklch(90% 0.016 232)', bg:'#fff', fg:'oklch(32% 0.03 250)' };
-      const aS = pick? (aWin?winStyle:loseStyle) : idle;
-      const bS = pick? (bWin?winStyle:loseStyle) : idle;
-      return { num:i+1, a:g.a, b:g.b,
-        pickA:()=>this.pick(g.id,g.a), pickB:()=>this.pick(g.id,g.b),
-        aBorder:aS.border, aBg:aS.bg, aFg:aS.fg, bBorder:bS.border, bBg:bS.bg, bFg:bS.fg,
-        aTag:aWin?'WON':(pick?'LOSS':''), bTag:bWin?'WON':(pick?'LOSS':''),
-        aTagColor:aWin?ACC:'oklch(66% 0.03 250)', bTagColor:bWin?ACC:'oklch(66% 0.03 250)',
-        aPressed:aWin?'true':'false', bPressed:bWin?'true':'false',
-        aAria:aWin?(g.a+' — winner, tap to clear'):(g.a+' — select as winner'),
-        bAria:bWin?(g.b+' — winner, tap to clear'):(g.b+' — select as winner') };
     });
 
     const total=cell.games.length; const done=Object.keys(draft).length;
