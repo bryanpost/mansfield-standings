@@ -171,6 +171,9 @@ class Component extends DCLogic {
       weeks[s] = wk.map(w=>({ week:w, date:this.fmtDate(sched[s][w].date) }));
       wk.forEach(w=>{
         const cell=sched[s][w];
+        // Match the club sheet: lower-numbered team on the left, rows ordered by lowest team number
+        cell.games.forEach(g=>{ if(g.aNo>g.bNo){ [g.a,g.b]=[g.b,g.a]; [g.aNo,g.bNo]=[g.bNo,g.aNo]; } });
+        cell.games.sort((x,y)=>x.aNo-y.aNo);
         const bye = teamsByShift[s].filter(t=>!cell.playing.has(t));
         cell.bye = bye.length===1 ? bye[0] : (bye.length>1 ? bye.join(', ') : null);
         cell.dateLabel = this.fmtDate(cell.date);
