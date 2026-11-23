@@ -102,7 +102,6 @@
         <span role="status" aria-live="polite"><sc-if value="{{ flash }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:600;color:oklch(48% 0.13 152);animation:fadeflash 2.2s ease forwards">✓ Saved</span></sc-if></span>
       </div>
       <div style="display:flex;align-items:center;gap:9px">
-        <sc-if value="{{ dirty }}" hint-placeholder-val="{{ false }}"><button onClick="{{ revert }}" style="padding:9px 14px;border-radius:8px;border:1px solid oklch(88% 0.02 250);background:#fff;color:oklch(46% 0.03 250);font-weight:600;font-size:13.5px;cursor:pointer" style-hover="background:oklch(96% 0.012 232)">Revert</button></sc-if>
         <button onClick="{{ submit }}" style="padding:10px 22px;border-radius:8px;border:none;background:{{ submitBg }};color:#fff;font-weight:600;font-size:14px;white-space:nowrap;cursor:{{ submitCursor }};opacity:{{ submitOpacity }}" style-hover="filter:brightness(1.05)">{{ submitLabel }}</button>
       </div>
     </div>
@@ -271,7 +270,7 @@ class Component extends DCLogic {
       rows,
       progressDone:done, progressTotal:total,
       dirty, flash:this.state.flash, saveError:this.state.error||'',
-      submit:()=>this.submit(), revert:()=>this.revert(),
+      submit:()=>this.submit(),
       submitLabel: this.state.saving?'Saving…':'Save',
       submitBg: canSubmit?ACC:'oklch(80% 0.02 250)', submitCursor:canSubmit?'pointer':'default', submitOpacity:canSubmit?'1':'.7',
     };
