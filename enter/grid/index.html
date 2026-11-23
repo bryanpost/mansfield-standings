@@ -38,7 +38,6 @@
         <div style="font:700 24px 'Saira Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;line-height:1">Enter Results</div>
         <div style="font-size:12.5px;color:oklch(52% 0.03 250);margin-top:2px">Mansfield Curling League · {{ season }}</div>
       </div>
-      <div style="font-size:11px;color:oklch(42% 0.09 152);background:oklch(96% 0.04 152);border:1px solid oklch(88% 0.06 152);border-radius:6px;padding:5px 9px;max-width:220px;line-height:1.4">● Live — saves to the shared league database for everyone.</div>
     </div>
   </header>
 
@@ -91,11 +90,6 @@
     <sc-if value="{{ saveError }}" hint-placeholder-val="{{ false }}">
       <div role="alert" style="margin-top:16px;font-size:12.5px;line-height:1.5;color:oklch(45% 0.16 27);background:oklch(97% 0.03 27);border:1px solid oklch(88% 0.07 27);border-radius:9px;padding:11px 13px">{{ saveError }}</div>
     </sc-if>
-
-    <!-- helper note about correction -->
-    <div style="margin-top:20px;font-size:12px;line-height:1.55;color:oklch(55% 0.03 250);background:#fff;border:1px solid oklch(92% 0.014 232);border-radius:9px;padding:12px 14px">
-      <strong style="color:oklch(38% 0.03 250)">Fixing a mistake?</strong> Just come back to this night and week later — your picks load already filled in. Change what's wrong and hit Save again; it overwrites, never duplicates.
-    </div>
 
   </main>
 
@@ -242,7 +236,7 @@ class Component extends DCLogic {
     const IDLE={ border:'oklch(88% 0.016 232)', bg:'#fff', fg:'oklch(50% 0.03 250)' };
     const rows=nos.map(no=>{
       const name=this.nameByNo[shift][no]; const e=gameByNo[no];
-      if(!e){ return { no, name, sub:'BYE — no game', rowOpacity:'.55', cursor:'default',
+      if(!e){ return { no, name, sub:'BYE', rowOpacity:'.55', cursor:'default',
         pickW:()=>{}, pickL:()=>{}, wPressed:'false', lPressed:'false', wAria:name+' bye', lAria:name+' bye',
         wBorder:IDLE.border, wBg:'oklch(96% 0.01 250)', wFg:'oklch(75% 0.02 250)', lBorder:IDLE.border, lBg:'oklch(96% 0.01 250)', lFg:'oklch(75% 0.02 250)' }; }
       const pick=draft[e.g.id]; const won=pick===e.me, lost=!!pick && !won;
